@@ -1,0 +1,28 @@
+{
+  "name": "vocavera",
+  "version": "1.0.0",
+  "description": "Master vocabulary with adaptive quizzes and spaced repetition",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx vite --port 8080",
+    "build": "npx vite build",
+    "preview": "npx vite preview --port 3000",
+    "start": "npx vite --port 8080"
+  },
+  "keywords": [
+    "vocabulary",
+    "learning",
+    "spaced-repetition",
+    "quiz",
+    "pwa"
+  ],
+  "author": "VocaVera Team",
+  "license": "MIT",
+  "devDependencies": {
+    "vite": "^5.4.0"
+  },
+  "dependencies": {},
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

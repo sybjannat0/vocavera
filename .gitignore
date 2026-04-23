@@ -1,0 +1,63 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+build/
+.out/
+
+# Vite
+.vite/
+.cache/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Cache
+.cache/
+.parcel-cache/
+
+# Vercel
+.vercel/
+
+# Misc
+*.pid
+*.seed
+*.pid.lock
+
+# GenerateTemp placeholders (keep actual icons)
+!/icons/icon-192x192.png
+!/icons/icon-512x512.png
+icons/*.png
+
+# SQL
+*.sql
+
+# Supabase
+supabase-debug.log
+
+# Test/check scripts
+check_*.js
+create_*.js
+test_*.js
+
