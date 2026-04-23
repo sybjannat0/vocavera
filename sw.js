@@ -1,31 +1,33 @@
 // VocaVera Service Worker — Versioned Cache
-const CACHE_VERSION = 'v2'; // Increment on each deploy
+const CACHE_VERSION = 'v3'; // Bumped for icon & manifest fixes
 const CACHE_NAME = `vocavera-cache-${CACHE_VERSION}`;
+
+// Assets to precache on install
 const ASSETS_TO_CACHE = [
-  './',
-  './index.html',
+  '/',
+  '/index.html',
   '/manifest.json',
   '/sw.js',
   '/icon-192.png',
   '/icon-512.png'
 ];
 
-// Install event - cache assets
+// Install event - precache core assets
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        console.log(`[SW] Cache opened: ${CACHE_NAME}`);
+        console.log(`[SW] Caching core assets`);
         return cache.addAll(ASSETS_TO_CACHE);
       })
       .catch((error) => {
-        console.log('[SW] Cache failed:', error);
+        console.log('[SW] Precache failed:', error);
       })
   );
   self.skipWaiting();
 });
 
-// Activate event - clean up old caches
+// Activate event - claim clients & clean up old caches
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -40,7 +42,7 @@ self.addEventListener('activate', (event) => {
     })
   );
   self.clients.claim();
-  // Notify clients that new SW is active
+  // Notify all clients that new SW is active
   self.clients.matchAll().then(clients => {
     clients.forEach(client => {
       client.postMessage({ type: 'SW_UPDATE_AVAILABLE' });
@@ -48,7 +50,7 @@ self.addEventListener('activate', (event) => {
   });
 });
 
-// Fetch event - Network-first for HTML (always fresh), Cache-first for static assets
+// Fetch event - smart caching strategy
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
@@ -56,11 +58,13 @@ self.addEventListener('fetch', (event) => {
   // Skip non-GET requests
   if (request.method !== 'GET') return;
 
-  // Skip cross-origin requests
+  // Skip cross-origin requests (e.g., Supabase, CDNs)
   if (!request.url.startsWith(self.location.origin)) return;
 
-  // For HTML pages: network-first (always get latest) with cache fallback
-  if (request.headers.get('accept')?.includes('text/html')) {
+  // For HTML, manifest, service worker: Network-first (always fresh)
+  if (request.destination === 'document' || 
+      request.url.includes('manifest.json') || 
+      request.url.includes('sw.js')) {
     event.respondWith(
       fetch(request)
         .then((response) => {
@@ -72,23 +76,51 @@ self.addEventListener('fetch', (event) => {
           return response;
         })
         .catch(() => {
-          // Network failed, serve cached page if available
+          // Network failed, try cache
           return caches.match(request).then(cached => {
             if (cached) return cached;
-            // Return a simple offline page
-            return new Response('Offline - No connection', { status: 503 });
+            return new Response('Offline', { status: 503 });
           });
         })
     );
     return;
   }
 
-  // For static assets: cache-first (fast)
+  // For images (icons, screenshots): Network-first with fallback to cache
+  if (request.destination === 'image') {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          const responseToCache = response.clone();
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put(request, responseToCache);
+          });
+          return response;
+        })
+        .catch(() => {
+          return caches.match(request).then(cached => {
+            if (cached) return cached;
+            // Return a 1x1 transparent PNG as fallback
+            return new Response(
+              'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
+              {
+                status: 200,
+                statusText: 'OK',
+                headers: { 'Content-Type': 'image/png' }
+              }
+            );
+          });
+        })
+    );
+    return;
+  }
+
+  // For other static assets: Cache-first with background revalidation
   event.respondWith(
     caches.match(request)
-      .then((cachedResponse) => {
-        if (cachedResponse) {
-          // Update cache in background (stale-while-revalidate)
+      .then((cached) => {
+        if (cached) {
+          // Revalidate in background
           fetch(request).then(response => {
             if (response && response.status === 200) {
               caches.open(CACHE_NAME).then(cache => {
@@ -96,27 +128,19 @@ self.addEventListener('fetch', (event) => {
               });
             }
           }).catch(() => {});
-          return cachedResponse;
+          return cached;
         }
-
         // Not in cache, fetch from network
         return fetch(request)
           .then((response) => {
-            if (!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
-            }
+            if (!response || response.status !== 200) return response;
             const responseToCache = response.clone();
             caches.open(CACHE_NAME).then(cache => {
               cache.put(request, responseToCache);
             });
             return response;
           })
-          .catch(() => {
-            // No network and not cached
-            if (request.destination === 'image') {
-              return new Response('Image not available offline', { status: 503 });
-            }
-          });
+          .catch(() => new Response('Offline', { status: 503 }));
       })
   );
 });
