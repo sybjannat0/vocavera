@@ -3,20 +3,29 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no">
     <meta name="description" content="Master vocabulary with adaptive quizzes and spaced repetition">
     <meta name="format-detection" content="telephone=no">
 
     <!-- PWA Meta Tags -->
-    <meta name="theme-color" content="#4F46E5">
+    <meta name="theme-color" content="#2563EB">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="VocaVera">
     <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="VocaVera">
 
-    <title>VocaVera - Master Words, Own Language</title>
-    <link rel="manifest" href="./manifest.json">
-    <link rel="apple-touch-icon" href="./icon-192.png">
+    <!-- iOS-specific: prevent blurred text on input focus -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="VocaVera">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+    <title>VocaVera</title>
+    <link rel="manifest" href="/manifest.json">
+    <!-- Apple touch icons (use absolute paths for reliability) -->
+    <link rel="apple-touch-icon" href="/icon-192.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="/icon-192.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="/icon-512.png">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/idb@8/build/umd.js"></script>
     <style>
@@ -910,47 +919,23 @@
         }
 
         /* Light Minimal Bottom Navigation */
+        /* Minimal Modern Bottom Navigation */
         .tab-bar {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            height: 64px;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(20px) saturate(160%);
-            -webkit-backdrop-filter: blur(20px) saturate(160%);
-            border-top: 1px solid rgba(0, 0, 0, 0.06);
+            height: 60px;
+            background: #FFFFFF;
+            border-top: 1px solid #E5E7EB;
             display: flex;
             justify-content: space-around;
             align-items: center;
             z-index: 1000;
-            box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
-            animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.05);
         }
 
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Subtle top accent line */
-        .tab-bar::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, #3B82F6, #8B5CF6, #EC4899);
-            opacity: 0.6;
-            transition: opacity 0.3s ease;
-        }
-
-        .tab-bar:hover::before {
-            opacity: 1;
-        }
-
-        /* Tab buttons — light airy style */
+        /* Tab buttons — minimal style */
         .tab-btn {
             flex: 1;
             height: 100%;
@@ -963,90 +948,86 @@
             background: transparent;
             cursor: pointer;
             color: #9CA3AF;
-            transition: all 280ms cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 200ms ease;
             position: relative;
             padding: 8px 4px;
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* Ripple click effect — subtle */
+        /* Ripple effect — minimal */
         .tab-btn .ripple {
             position: absolute;
             border-radius: 50%;
-            background: rgba(59, 130, 246, 0.12);
+            background: rgba(59, 130, 246, 0.1);
             transform: scale(0);
-            animation: rippleAnim 0.5s ease-out forwards;
+            animation: rippleAnim 0.4s ease-out forwards;
             pointer-events: none;
         }
 
         @keyframes rippleAnim {
-            to { transform: scale(3); opacity: 0; }
+            to { transform: scale(2.5); opacity: 0; }
         }
 
-        /* Hover: slight lift */
+        /* Hover state */
         .tab-btn:hover {
-            transform: translateY(-2px);
             color: #6B7280;
         }
 
-        /* Active selection: bottom indicator pill */
+        /* Active state — dot indicator above icon */
         .tab-btn.active {
-            color: #3B82F6;
+            color: #2563EB;
         }
 
-        .tab-btn.active::after {
+        .tab-btn.active::before {
             content: '';
             position: absolute;
-            bottom: 10px;
+            top: 8px;
             left: 50%;
-            transform: translateX(-50%) scaleX(0);
-            width: 20px;
-            height: 3px;
-            border-radius: 2px;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
             background: currentColor;
-            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 0 8px currentColor;
+            transition: all 200ms ease;
         }
 
-        .tab-btn.active::after {
-            transform: translateX(-50%) scaleX(1);
-        }
-
-        /* Smooth fade-in for icon + label on activation */
+        /* Smooth transitions for icon and label */
         .tab-btn .tab-icon,
         .tab-btn .tab-label {
-            transition: all 280ms cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 200ms ease;
         }
 
         .tab-btn.active .tab-icon {
-            transform: translateY(-2px) scale(1.05);
+            transform: scale(1.08);
         }
 
         .tab-btn.active .tab-label {
-            color: #3B82F6;
+            color: #2563EB;
             font-weight: 600;
-            text-shadow: 0 0 8px rgba(59, 130, 246, 0.3);
         }
 
-        /* Per-tab active colors (soft pastel palette) */
-        .tab-btn[data-tab="home"].active { color: #3B82F6; }      /* Blue */
-        .tab-btn[data-tab="add"].active { color: #10B981; }      /* Emerald */
-        .tab-btn[data-tab="words"].active { color: #F59E0B; }    /* Amber */
-        .tab-btn[data-tab="quiz"].active { color: #EF4444; }     /* Rose */
-        .tab-btn[data-tab="stats"].active { color: #8B5CF6; }    /* Violet */
+        /* Per-tab active colors — cohesive blue palette */
+        .tab-btn[data-tab="home"].active { color: #2563EB; }     /* Blue */
+        .tab-btn[data-tab="add"].active { color: #059669; }     /* Green */
+        .tab-btn[data-tab="words"].active { color: #D97706; }   /* Amber */
+        .tab-btn[data-tab="quiz"].active { color: #DC2626; }    /* Red */
+        .tab-btn[data-tab="stats"].active { color: #7C3AED; }   /* Purple */
 
-        /* Tab icon size */
+        /* Tab icon — simple stroke style, consistent size */
         .tab-icon {
             width: 24px;
             height: 24px;
-            transition: all 280ms cubic-bezier(0.4, 0, 0.2, 1);
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
         }
 
-        /* Tab label — clean and crisp */
+        /* Tab label — small, clean, unobtrusive */
         .tab-label {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 600;
-            letter-spacing: 0.4px;
+            letter-spacing: 0.02em;
             color: #9CA3AF;
         }
 
@@ -1054,7 +1035,15 @@
             color: #6B7280;
         }
 
-        /* Magnetic hover via JS — gentle, does not interfere */
+        .tab-btn.active .tab-label {
+            color: #2563EB;
+        }
+
+        /* Subtle background fill on active (optional) */
+        .tab-btn.active {
+            background: rgba(59, 130, 246, 0.04);
+            border-radius: 10px 10px 0 0;
+        }
 
         .h1 {
             font-size: 26px;
@@ -10076,37 +10065,37 @@
         <!-- Tab Bar -->
         <nav id="tabBar" class="tab-bar">
             <button class="tab-btn active" data-tab="home">
-                <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg class="tab-icon" viewBox="0 0 24 24" stroke="currentColor">
                     <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
                     <polyline points="9 22 9 12 15 12 15 22" />
                 </svg>
                 <span class="tab-label">Home</span>
             </button>
             <button class="tab-btn" data-tab="add">
-                <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10" />
-                    <line x1="12" y1="8" x2="12" y2="16" />
-                    <line x1="8" y1="12" x2="16" y2="12" />
+                <svg class="tab-icon" viewBox="0 0 24 24" stroke="currentColor">
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
                 </svg>
                 <span class="tab-label">Add</span>
             </button>
             <button class="tab-btn" data-tab="words">
-                <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg class="tab-icon" viewBox="0 0 24 24" stroke="currentColor">
                     <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
                     <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
                 </svg>
                 <span class="tab-label">Words</span>
             </button>
             <button class="tab-btn" data-tab="quiz">
-                <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 2a10 10 0 1 0 10 10H12V2z" />
-                    <path d="M12 12 2.5 9.5" />
-                    <path d="M12 12v9.5" />
+                <svg class="tab-icon" viewBox="0 0 24 24" stroke="currentColor">
+                    <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
+                    <rect x="9" y="3" width="6" height="4" rx="1" />
+                    <path d="M9 12h6" />
+                    <path d="M9 16h6" />
                 </svg>
                 <span class="tab-label">Quiz</span>
             </button>
             <button class="tab-btn" data-tab="stats">
-                <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg class="tab-icon" viewBox="0 0 24 24" stroke="currentColor">
                     <line x1="18" y1="20" x2="18" y2="10" />
                     <line x1="12" y1="20" x2="12" y2="4" />
                     <line x1="6" y1="20" x2="6" y2="14" />
