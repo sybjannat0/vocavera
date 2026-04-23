@@ -621,21 +621,83 @@
             }
         }
 
+        /* Full-Width Bottom Navigation — Neon Cyberpunk Style */
         .tab-bar {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            height: calc(64px + env(safe-area-inset-bottom));
-            padding-bottom: env(safe-area-inset-bottom);
-            background: var(--surface);
-            backdrop-filter: blur(20px);
-            border-top: 1px solid var(--border-light);
+            height: 70px;
+            background: linear-gradient(180deg, #0F0F1A 0%, #1A1A2E 100%);
+            border-top: 1px solid rgba(99, 102, 241, 0.3);
             display: flex;
             justify-content: space-around;
             align-items: center;
             z-index: 1000;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 -4px 30px rgba(79, 70, 229, 0.4);
+            overflow: hidden;
+            animation: slideUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Animated gradient border line at top */
+        .tab-bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg,
+                #4F46E5 0%,
+                #7C3AED 20%,
+                #EC4899 40%,
+                #F59E0B 60%,
+                #10B981 80%,
+                #4F46E5 100%
+            );
+            background-size: 200% auto;
+            animation: gradientShift 4s linear infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% center; }
+            100% { background-position: -200% center; }
+        }
+
+        .tab-bar::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 24px;
+            padding: 1px;
+            background: linear-gradient(135deg,
+                rgba(255, 107, 107, 0.4) 0%,
+                rgba(78, 205, 196, 0.4) 25%,
+                rgba(255, 217, 61, 0.4) 50%,
+                rgba(126, 87, 194, 0.4) 75%,
+                rgba(79, 70, 229, 0.4) 100%
+            );
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+
+        .tab-bar:hover {
+            box-shadow:
+                0 -4px 20px rgba(0, 0, 0, 0.08);
         }
 
         .sub-tab-toggle {
@@ -847,9 +909,51 @@
             background: var(--primary-light);
         }
 
+        /* Light Minimal Bottom Navigation */
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 64px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px) saturate(160%);
+            -webkit-backdrop-filter: blur(20px) saturate(160%);
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 1000;
+            box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
+            animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Subtle top accent line */
+        .tab-bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #3B82F6, #8B5CF6, #EC4899);
+            opacity: 0.6;
+            transition: opacity 0.3s ease;
+        }
+
+        .tab-bar:hover::before {
+            opacity: 1;
+        }
+
+        /* Tab buttons — light airy style */
         .tab-btn {
             flex: 1;
-            height: 64px;
+            height: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -858,61 +962,99 @@
             border: none;
             background: transparent;
             cursor: pointer;
-            color: var(--text-muted);
-            transition: all 200ms ease;
+            color: #9CA3AF;
+            transition: all 280ms cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
-            overflow: hidden;
+            padding: 8px 4px;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .tab-btn.active {
-            color: var(--primary);
-            background: rgba(79, 70, 229, 0.08);
-        }
-        
-        .tab-btn:hover:not(.active) {
-            background: rgba(0, 0, 0, 0.02);
-            color: var(--text-secondary);
-        }
-        
-        .tab-btn:active {
-            transform: scale(0.95);
-        }
-
-        .tab-indicator {
+        /* Ripple click effect — subtle */
+        .tab-btn .ripple {
             position: absolute;
-            top: 8px;
+            border-radius: 50%;
+            background: rgba(59, 130, 246, 0.12);
+            transform: scale(0);
+            animation: rippleAnim 0.5s ease-out forwards;
+            pointer-events: none;
+        }
+
+        @keyframes rippleAnim {
+            to { transform: scale(3); opacity: 0; }
+        }
+
+        /* Hover: slight lift */
+        .tab-btn:hover {
+            transform: translateY(-2px);
+            color: #6B7280;
+        }
+
+        /* Active selection: bottom indicator pill */
+        .tab-btn.active {
+            color: #3B82F6;
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: 10px;
             left: 50%;
-            transform: translateX(-50%);
-            padding: 4px 16px;
-            background: var(--primary-light);
-            border-radius: 12px;
-            z-index: -1;
-            transition: all 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
-            opacity: 0
+            transform: translateX(-50%) scaleX(0);
+            width: 20px;
+            height: 3px;
+            border-radius: 2px;
+            background: currentColor;
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 0 8px currentColor;
         }
 
-        .tab-btn.active .tab-indicator {
-            opacity: 1
+        .tab-btn.active::after {
+            transform: translateX(-50%) scaleX(1);
         }
 
+        /* Smooth fade-in for icon + label on activation */
+        .tab-btn .tab-icon,
+        .tab-btn .tab-label {
+            transition: all 280ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .tab-btn.active .tab-icon {
+            transform: translateY(-2px) scale(1.05);
+        }
+
+        .tab-btn.active .tab-label {
+            color: #3B82F6;
+            font-weight: 600;
+            text-shadow: 0 0 8px rgba(59, 130, 246, 0.3);
+        }
+
+        /* Per-tab active colors (soft pastel palette) */
+        .tab-btn[data-tab="home"].active { color: #3B82F6; }      /* Blue */
+        .tab-btn[data-tab="add"].active { color: #10B981; }      /* Emerald */
+        .tab-btn[data-tab="words"].active { color: #F59E0B; }    /* Amber */
+        .tab-btn[data-tab="quiz"].active { color: #EF4444; }     /* Rose */
+        .tab-btn[data-tab="stats"].active { color: #8B5CF6; }    /* Violet */
+
+        /* Tab icon size */
         .tab-icon {
             width: 24px;
             height: 24px;
-            transition: transform 200ms ease;
-        }
-        
-        .tab-btn.active .tab-icon {
-            transform: scale(1.1);
-        }
-        
-        .tab-btn:hover:not(.active) .tab-icon {
-            transform: scale(1.05);
+            transition: all 280ms cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        /* Tab label — clean and crisp */
         .tab-label {
-            font-size: 10px;
-            font-weight: 500
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.4px;
+            color: #9CA3AF;
         }
+
+        .tab-btn:hover .tab-label {
+            color: #6B7280;
+        }
+
+        /* Magnetic hover via JS — gentle, does not interfere */
 
         .h1 {
             font-size: 26px;
@@ -9934,7 +10076,6 @@
         <!-- Tab Bar -->
         <nav id="tabBar" class="tab-bar">
             <button class="tab-btn active" data-tab="home">
-                <div class="tab-indicator"></div>
                 <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
                     <polyline points="9 22 9 12 15 12 15 22" />
@@ -9942,7 +10083,6 @@
                 <span class="tab-label">Home</span>
             </button>
             <button class="tab-btn" data-tab="add">
-                <div class="tab-indicator"></div>
                 <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="10" />
                     <line x1="12" y1="8" x2="12" y2="16" />
@@ -9951,7 +10091,6 @@
                 <span class="tab-label">Add</span>
             </button>
             <button class="tab-btn" data-tab="words">
-                <div class="tab-indicator"></div>
                 <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
                     <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
@@ -9959,7 +10098,6 @@
                 <span class="tab-label">Words</span>
             </button>
             <button class="tab-btn" data-tab="quiz">
-                <div class="tab-indicator"></div>
                 <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M12 2a10 10 0 1 0 10 10H12V2z" />
                     <path d="M12 12 2.5 9.5" />
@@ -9968,7 +10106,6 @@
                 <span class="tab-label">Quiz</span>
             </button>
             <button class="tab-btn" data-tab="stats">
-                <div class="tab-indicator"></div>
                 <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="18" y1="20" x2="18" y2="10" />
                     <line x1="12" y1="20" x2="12" y2="4" />
@@ -10028,13 +10165,17 @@
         // Generate temporary local IDs (negative numbers as strings) for words only
         let nextLocalId = -1;
         const generateId = () => (nextLocalId--).toString();
-        // Generate UUID for server-managed entities (categories, groups)
+        // Generate proper UUID v4 for server-managed entities (categories, groups)
         const generateUUID = () => {
             if (typeof crypto !== 'undefined' && crypto.randomUUID) {
                 return crypto.randomUUID();
             }
-            // Fallback
-            return 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            // Fallback: generate a proper UUID v4 format
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
         };
         const formatDate = d => new Date(d).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
         const today = () => new Date().toDateString();
@@ -10066,10 +10207,39 @@
             setTimeout(() => toast.remove(), duration);
         }
 
-        // Tab Navigation
+        // Tab Navigation with animated effects
         function initTabs() {
+            // Ripple effect helper
+            const createRipple = (btn, event) => {
+                const ripple = document.createElement('span');
+                ripple.classList.add('ripple');
+                const rect = btn.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height) * 2;
+                const x = event.clientX - rect.left - size / 2;
+                const y = event.clientY - rect.top - size / 2;
+                ripple.style.cssText = `width:${size}px;height:${size}px;left:${x}px;top:${y}px;`;
+                btn.appendChild(ripple);
+                ripple.addEventListener('animationend', () => ripple.remove());
+            };
+
             $$('.tab-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
+                // Magnetic hover effect — very subtle
+                btn.addEventListener('mousemove', (e) => {
+                    if (btn.classList.contains('active')) return;
+                    const rect = btn.getBoundingClientRect();
+                    const x = e.clientX - rect.left - rect.width / 2;
+                    const y = e.clientY - rect.top - rect.height / 2;
+                    const strength = 0.15;
+                    btn.style.transform = `translate(${x * strength}px, ${y * strength}px)`;
+                });
+
+                btn.addEventListener('mouseleave', () => {
+                    btn.style.transform = '';
+                });
+
+                // Ripple click effect
+                btn.addEventListener('click', (e) => {
+                    createRipple(btn, e);
                     const tab = btn.dataset.tab;
                     switchTab(tab);
                 });
@@ -10077,7 +10247,11 @@
         }
 
         function switchTab(tabName) {
-            $$('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tabName));
+            $$('.tab-btn').forEach(b => {
+                b.classList.toggle('active', b.dataset.tab === tabName);
+                // Clear any magnetic hover inline transform when tab state changes
+                b.style.transform = '';
+            });
             $$('.tab-pane').forEach(p => p.classList.toggle('active', p.id === `tab-${tabName}`));
             if (tabName === 'home') updateHome();
             if (tabName === 'words') renderWords();
@@ -11081,24 +11255,12 @@
                              </svg>
                              Edit
                          </button>
-                         <button class="word-modal-btn favorite ${word.favorite ? 'active' : ''}" onclick="toggleFavorite('${word.id}')">
-                             <svg class="word-modal-btn-icon" viewBox="0 0 24 24" fill="${word.favorite ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
-                                 <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
-                             </svg>
-                             <span class="favorite-label">${word.favorite ? 'Favorited' : 'Favorite'}</span>
-                         </button>
-                         <button class="word-modal-btn practice ${word.practice ? 'active' : ''}" onclick="togglePractice('${word.id}')">
-                             <svg class="word-modal-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                 <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                             </svg>
-                             <span>${word.practice ? 'Practicing' : 'Practice'}</span>
-                         </button>
-                         <button class="word-modal-btn quiz ${word.quiz ? 'active' : ''}" onclick="toggleQuiz('${word.id}')">
-                             <svg class="word-modal-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                 <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
-                             </svg>
-                             <span>${word.quiz ? 'Quiz Mode' : 'Quiz'}</span>
-                         </button>
+                          <button class="word-modal-btn favorite ${word.favorite ? 'active' : ''}" onclick="toggleFavorite('${word.id}')">
+                              <svg class="word-modal-btn-icon" viewBox="0 0 24 24" fill="${word.favorite ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
+                                  <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                              </svg>
+                              <span class="favorite-label">${word.favorite ? 'Favorited' : 'Favorite'}</span>
+                          </button>
                      </div>
                 </div>
             </div>
@@ -11117,9 +11279,18 @@
                 word.updatedAt = Date.now();
                 saveData();
                 renderWords();
+                // Update the modal button state in place (don't recreate modal)
                 const modal = document.querySelector('.word-modal');
-                if (modal) modal.remove();
-                showWordDetail(targetId);
+                if (modal) {
+                    const btn = modal.querySelector('.word-modal-btn.favorite');
+                    if (btn) {
+                        btn.classList.toggle('active', word.favorite);
+                        const label = btn.querySelector('.favorite-label');
+                        if (label) label.textContent = word.favorite ? 'Favorited' : 'Favorite';
+                        const svg = btn.querySelector('svg');
+                        if (svg) svg.setAttribute('fill', word.favorite ? 'currentColor' : 'none');
+                    }
+                }
                 SyncService.uploadWord(word).catch(err => {
                     console.error('Background favorite sync failed:', err);
                 });
@@ -11134,9 +11305,16 @@
                 word.updatedAt = Date.now();
                 saveData();
                 renderWords();
+                // Update in place if modal open
                 const modal = document.querySelector('.word-modal');
-                if (modal) modal.remove();
-                showWordDetail(targetId);
+                if (modal) {
+                    const btn = modal.querySelector('.word-modal-btn.practice');
+                    if (btn) {
+                        btn.classList.toggle('active', word.practice);
+                        const span = btn.querySelector('span');
+                        if (span) span.textContent = word.practice ? 'Practicing' : 'Practice';
+                    }
+                }
                 SyncService.uploadWord(word).catch(err => {
                     console.error('Background practice sync failed:', err);
                 });
@@ -11151,9 +11329,16 @@
                 word.updatedAt = Date.now();
                 saveData();
                 renderWords();
+                // Update in place if modal open
                 const modal = document.querySelector('.word-modal');
-                if (modal) modal.remove();
-                showWordDetail(targetId);
+                if (modal) {
+                    const btn = modal.querySelector('.word-modal-btn.quiz');
+                    if (btn) {
+                        btn.classList.toggle('active', word.quiz);
+                        const span = btn.querySelector('span');
+                        if (span) span.textContent = word.quiz ? 'Quiz Mode' : 'Quiz';
+                    }
+                }
                 SyncService.uploadWord(word).catch(err => {
                     console.error('Background quiz sync failed:', err);
                 });
