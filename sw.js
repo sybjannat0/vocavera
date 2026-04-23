@@ -4,9 +4,10 @@ const CACHE_NAME = `vocavera-cache-${CACHE_VERSION}`;
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './manifest.json',
-  './icon-192.png',
-  './icon-512.png'
+  '/manifest.json',
+  '/sw.js',
+  '/icon-192.png',
+  '/icon-512.png'
 ];
 
 // Install event - cache assets

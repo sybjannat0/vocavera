@@ -15,44 +15,44 @@
   "prefer_related_applications": false,
   "icons": [
     {
-      "src": "/icon-192.png",
+      "src": "https://vocavera.vercel.app/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icon-512.png",
+      "src": "https://vocavera.vercel.app/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icon-192.png",
+      "src": "https://vocavera.vercel.app/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/icon-512.png",
+      "src": "https://vocavera.vercel.app/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     }
-   ],
+  ],
   "shortcuts": [
     {
       "name": "Add New Word",
       "short_name": "Add Word",
       "description": "Quickly add a new vocabulary word",
       "url": "/?tab=add",
-      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+      "icons": [{ "src": "https://vocavera.vercel.app/icon-192.png", "sizes": "192x192" }]
     },
     {
       "name": "Start Quiz",
       "short_name": "Quiz",
       "description": "Begin a vocabulary quiz",
       "url": "/?tab=quiz",
-      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+      "icons": [{ "src": "https://vocavera.vercel.app/icon-192.png", "sizes": "192x192" }]
     }
   ]
 }
