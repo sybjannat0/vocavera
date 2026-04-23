@@ -7,7 +7,16 @@
     <meta name="description" content="Master vocabulary with adaptive quizzes and spaced repetition">
     <meta name="format-detection" content="telephone=no">
 
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#4F46E5">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="VocaVera">
+    <meta name="mobile-web-app-capable" content="yes">
+
     <title>VocaVera - Master Words, Own Language</title>
+    <link rel="manifest" href="./manifest.json">
+    <link rel="apple-touch-icon" href="./icon-192.png">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/idb@8/build/umd.js"></script>
     <style>
@@ -152,6 +161,159 @@
             visibility: hidden
         }
 
+        /* Login Page Styles */
+        #login-screen {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 20px;
+            transition: opacity 300ms ease, visibility 300ms ease
+        }
+
+        #login-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 24px;
+            padding: 40px 32px;
+            width: 100%;
+            max-width: 360px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            animation: loginSlideUp 400ms cubic-bezier(0.16, 1, 0.3, 1)
+        }
+
+        @keyframes loginSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px)
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .login-logo {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center
+        }
+
+        .login-logo svg {
+            width: 36px;
+            height: 36px;
+            color: white
+        }
+
+        .login-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: #111827;
+            margin-bottom: 8px
+        }
+
+        .login-subtitle {
+            font-size: 14px;
+            color: #6B7280;
+            margin-bottom: 32px
+        }
+
+        .login-pin-input {
+            width: 100%;
+            padding: 16px;
+            font-size: 24px;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: 8px;
+            border: 2px solid #E5E7EB;
+            border-radius: 16px;
+            background: #F9FAFB;
+            color: #111827;
+            transition: all 200ms ease;
+            box-sizing: border-box;
+            outline: none
+        }
+
+        .login-pin-input:focus {
+            border-color: #667EEA;
+            background: white;
+            box-shadow: 0 0 0 6px rgba(102, 126, 234, 0.15)
+        }
+
+        .login-pin-input::placeholder {
+            color: #D1D5DB;
+            letter-spacing: 4px
+        }
+
+        .login-error {
+            margin-top: 16px;
+            padding: 12px;
+            background: #FEF2F2;
+            color: #DC2626;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            display: none
+        }
+
+        .login-error.visible {
+            display: block;
+            animation: shake 400ms ease
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0) }
+            20%, 60% { transform: translateX(-8px) }
+            40%, 80% { transform: translateX(8px) }
+        }
+
+        .login-footer {
+            margin-top: 24px;
+            font-size: 12px;
+            color: #9CA3AF
+        }
+
+        .login-logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px 16px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 200ms ease;
+            backdrop-filter: blur(10px);
+            z-index: 10000;
+            display: none
+        }
+
+        .login-logout-btn.visible {
+            display: block
+        }
+
+        .login-logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px)
+        }
+
         .loading-logo {
             width: 64px;
             height: 64px;
@@ -232,6 +394,13 @@
             z-index: 1000
         }
 
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            position: relative
+        }
+
         .brand {
             display: flex;
             align-items: center;
@@ -253,7 +422,17 @@
             justify-content: center;
             border: none;
             cursor: pointer;
-            position: relative
+            position: relative;
+            transition: transform 200ms ease, box-shadow 200ms ease
+        }
+
+        .avatar-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3)
+        }
+
+        .avatar-btn:active {
+            transform: scale(0.95)
         }
 
         .avatar-letter {
@@ -273,6 +452,117 @@
             padding: 1px 4px;
             border-radius: 50%;
             border: 2px solid white
+        }
+
+        /* Account dropdown menu */
+        .account-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+            border: 1px solid var(--border-light);
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px);
+            transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1001
+        }
+
+        .account-menu.open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0)
+        }
+
+        .account-menu-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .account-menu-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), #7C3AED);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: white
+        }
+
+        .account-menu-info {
+            flex: 1;
+            min-width: 0
+        }
+
+        .account-menu-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis
+        }
+
+        .account-menu-email {
+            font-size: 11px;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis
+        }
+
+        .account-menu-list {
+            padding: 4px
+        }
+
+        .account-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 10px 12px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-primary);
+            transition: background 150ms ease
+        }
+
+        .account-menu-item:hover {
+            background: var(--primary-light)
+        }
+
+        .account-menu-item svg {
+            width: 16px;
+            height: 16px;
+            color: var(--text-secondary)
+        }
+
+        .account-menu-item.logout {
+            color: var(--error);
+            border-top: 1px solid var(--border-light);
+            margin-top: 4px;
+            padding-top: 8px
+        }
+
+        .account-menu-item.logout:hover {
+            background: var(--error-light)
+        }
+
+        .account-menu-item.logout svg {
+            color: var(--error)
         }
 
         .content-area {
@@ -7911,6 +8201,24 @@
 </head>
 
 <body>
+    <div id="login-screen" class="hidden">
+        <button id="logoutBtn" class="login-logout-btn">Logout</button>
+        <div class="login-card">
+            <div class="login-logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                    <path d="M2 17l10 5 10-5"/>
+                    <path d="M2 12l10 5 10-5"/>
+                </svg>
+            </div>
+            <h1 class="login-title">VocaVera</h1>
+            <p class="login-subtitle">Enter your PIN to continue</p>
+            <input type="password" id="pinInput" class="login-pin-input" placeholder="••••" maxlength="6" autocomplete="off" inputmode="numeric">
+            <div id="loginError" class="login-error">Incorrect PIN. Please try again.</div>
+            <p class="login-footer">Session lasts for 1 week</p>
+        </div>
+    </div>
+
     <div id="loading-screen">
         <div class="loading-logo">
             <svg viewBox="0 0 64 64" fill="none">
@@ -7934,24 +8242,60 @@
     </div>
 
     <div id="app" class="hidden">
-        <header id="appHeader" class="app-header">
-            <div class="brand">
-                <div class="brand-mark">
-                    <svg viewBox="0 0 28 28" fill="none">
-                        <defs>
-                            <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stop-color="#4F46E5" />
-                                <stop offset="100%" stop-color="#9333EA" />
-                            </linearGradient>
-                        </defs>
-                        <path d="M14 2L24 12L20 22L14 28L8 22L4 12L14 2Z" fill="url(#brandGrad)" />
-                    </svg>
+         <header id="appHeader" class="app-header">
+             <div class="brand">
+                 <div class="brand-mark">
+                     <svg viewBox="0 0 28 28" fill="none">
+                         <defs>
+                             <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                 <stop offset="0%" stop-color="#4F46E5" />
+                                 <stop offset="100%" stop-color="#9333EA" />
+                             </linearGradient>
+                         </defs>
+                         <path d="M14 2L24 12L20 22L14 28L8 22L4 12L14 2Z" fill="url(#brandGrad)" />
+                     </svg>
+                 </div>
+                 <span class="brand-name">VocaVera</span>
+             </div>
+             <div class="header-actions">
+                 <button class="avatar-btn" id="avatarBtn">
+                     <span class="avatar-letter">V</span>
+                     <span class="xp-badge" id="levelBadge">1</span>
+                 </button>
+             </div>
+             <!-- Account Dropdown Menu -->
+             <div class="account-menu" id="accountMenu">
+                <div class="account-menu-header">
+                    <div class="account-menu-avatar">V</div>
+                    <div class="account-menu-info">
+                        <div class="account-menu-name">VocaVera User</div>
+                        <div class="account-menu-email">user@vocavera.app</div>
+                    </div>
                 </div>
-                <span class="brand-name">VocaVera</span>
-            </div>
-            <div class="header-actions">
-                <button class="avatar-btn" id="avatarBtn"><span class="avatar-letter">V</span><span class="xp-badge"
-                        id="levelBadge">1</span></button>
+                <div class="account-menu-list">
+                    <button class="account-menu-item" id="profileBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                        Profile
+                    </button>
+                    <button class="account-menu-item" id="settingsBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M12 1v6m0 6v6m6-12.3l-5.2 3M12 1l5.2 3m-6.5-3L1 12.3M23 12l-5.2 3m6.5-3l-5.2-3"/>
+                        </svg>
+                        Settings
+                    </button>
+                    <button class="account-menu-item logout" id="accountLogoutBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                            <polyline points="16 17 21 12 16 7"/>
+                            <line x1="21" y1="12" x2="9" y2="12"/>
+                        </svg>
+                        Logout
+                    </button>
+                </div>
             </div>
         </header>
 
@@ -12228,8 +12572,93 @@
             console.log('ℹ️ Supabase not available, using local mode:', err);
         }
 
-        // Initialize App
+        // Session Management
+        const SESSION_KEY = 'vocavera_session';
+        const SESSION_DURATION_MS = 7 * 24 * 60 * 60 * 1000; // 1 week
+
+        function getSession() {
+            try {
+                const session = localStorage.getItem(SESSION_KEY);
+                return session ? JSON.parse(session) : null;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function setSession() {
+            const expiresAt = Date.now() + SESSION_DURATION_MS;
+            const session = { authenticated: true, expiresAt };
+            localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+            return session;
+        }
+
+        function clearSession() {
+            localStorage.removeItem(SESSION_KEY);
+        }
+
+        function isAuthenticated() {
+            const session = getSession();
+            return session && session.authenticated && session.expiresAt > Date.now();
+        }
+
+        // PIN Authentication
+        const CORRECT_PIN = '179084';
+
+        function attemptLogin(pin) {
+            if (pin === CORRECT_PIN) {
+                setSession();
+                showApp();
+                return true;
+            }
+            return false;
+        }
+
+        function showLoginScreen() {
+            const loginScreen = $('login-screen');
+            const app = $('app');
+            const loadingScreen = $('loading-screen');
+
+            // Hide app and loading
+            app.classList.add('hidden');
+            loadingScreen.classList.add('hidden');
+
+            // Show login
+            loginScreen.classList.remove('hidden');
+            $('pinInput').value = '';
+            $('loginError').classList.remove('visible');
+            $('pinInput').focus();
+        }
+
+        function showApp() {
+            const loginScreen = $('login-screen');
+            const app = $('app');
+            const loadingScreen = $('loading-screen');
+
+            // Show loading first (if app needs to initialize)
+            loadingScreen.classList.remove('hidden');
+            loginScreen.classList.add('hidden');
+
+            // Initialize app after brief delay
+            setTimeout(() => {
+                loadingScreen.classList.add('hidden');
+                app.classList.remove('hidden');
+                updateHome();
+            }, 500);
+        }
+
+        function handleLogout() {
+            clearSession();
+            showLoginScreen();
+        }
+
+        // Modified init to check authentication
         function init() {
+            if (!isAuthenticated()) {
+                showLoginScreen();
+                return;
+            }
+
+            // User is authenticated, load the app
             loadData();
             initTabs();
             initAddWord();
@@ -12239,7 +12668,7 @@
             initManageModal();
             initQuickActions();
 
-            // Hide loading screen
+            // Show app after loading
             setTimeout(() => {
                 $('loading-screen').classList.add('hidden');
                 $('app').classList.remove('hidden');
@@ -12247,8 +12676,118 @@
             }, 1500);
         }
 
+        // Event Listeners for login and logout
+        document.addEventListener('DOMContentLoaded', () => {
+            const pinInput = $('pinInput');
+            const logoutBtn = $('logoutBtn');
+
+            // PIN input handler
+            if (pinInput) {
+                pinInput.addEventListener('input', (e) => {
+                    const value = e.target.value;
+                    // Remove any non-numeric characters
+                    e.target.value = value.replace(/[^0-9]/g, '');
+
+                    // Auto-submit when 6 digits entered
+                    if (e.target.value.length === 6) {
+                        const success = attemptLogin(e.target.value);
+                        if (!success) {
+                            const error = $('loginError');
+                            error.classList.add('visible');
+                            e.target.value = '';
+                            setTimeout(() => {
+                                e.target.focus();
+                            }, 100);
+                        }
+                    }
+                });
+
+                // Allow Enter key to submit
+                pinInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && pinInput.value.length > 0) {
+                        attemptLogin(pinInput.value);
+                    }
+                });
+            }
+
+            // Logout button (on login screen only)
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', handleLogout);
+            }
+
+            // Account menu toggle
+            const avatarBtn = $('avatarBtn');
+            const accountMenu = $('accountMenu');
+            const accountLogoutBtn = $('accountLogoutBtn');
+            const profileBtn = $('profileBtn');
+            const settingsBtn = $('settingsBtn');
+
+            if (avatarBtn && accountMenu) {
+                avatarBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    accountMenu.classList.toggle('open');
+                });
+
+                // Close menu when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (accountMenu.classList.contains('open') && !accountMenu.contains(e.target)) {
+                        accountMenu.classList.remove('open');
+                    }
+                });
+
+                // Close menu on escape key
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && accountMenu.classList.contains('open')) {
+                        accountMenu.classList.remove('open');
+                    }
+                });
+            }
+
+            // Account logout button
+            if (accountLogoutBtn) {
+                accountLogoutBtn.addEventListener('click', () => {
+                    handleLogout();
+                    accountMenu.classList.remove('open');
+                });
+            }
+
+            // Profile and Settings buttons (placeholder)
+            if (profileBtn) {
+                profileBtn.addEventListener('click', () => {
+                    console.log('Profile clicked');
+                    accountMenu.classList.remove('open');
+                });
+            }
+            if (settingsBtn) {
+                settingsBtn.addEventListener('click', () => {
+                    console.log('Settings clicked');
+                    accountMenu.classList.remove('open');
+                });
+            }
+
+            // Register Service Worker
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('./sw.js')
+                  .then((reg) => {
+                    console.log('✅ Service Worker registered:', reg.scope);
+                    
+                    // Check for updates
+                    reg.addEventListener('updatefound', () => {
+                      const newWorker = reg.installing;
+                      console.log('🔄 New service worker found');
+                    });
+                  })
+                  .catch((err) => console.log('❌ SW registration failed:', err));
+            }
+
+
+
+            // Check authentication and initialize
+            init();
+        });
+
         // Start
-        document.addEventListener('DOMContentLoaded', init);
+        // document.addEventListener('DOMContentLoaded', init); // Replaced by inline init call below
     </script>
 
     <!-- Category/Group Modal -->
