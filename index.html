@@ -2957,23 +2957,51 @@
             box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4)
         }
 
-        .word-modal-btn.favorite {
-            background: linear-gradient(135deg, #F59E0B, #D97706);
-            color: white;
-            border: none
-        }
+         .word-modal-btn.favorite {
+             background: linear-gradient(135deg, #F59E0B, #D97706);
+             color: white;
+             border: none
+         }
 
-        .word-modal-btn.favorite.active {
-            background: linear-gradient(135deg, #EF4444, #DC2626);
-        }
+         .word-modal-btn.favorite.active {
+             background: linear-gradient(135deg, #EF4444, #DC2626);
+         }
 
-        .word-modal-btn.favorite:hover {
-            box-shadow: 0 8px 20px rgba(245, 158, 11, 0.4)
-        }
+         .word-modal-btn.favorite:hover {
+             box-shadow: 0 8px 20px rgba(245, 158, 11, 0.4)
+         }
 
-        .favorite-label {
-            font-size: 13px
-        }
+         .favorite-label {
+             font-size: 13px
+         }
+
+         .word-modal-btn.practice {
+             background: linear-gradient(135deg, #10B981, #059669);
+             color: white;
+             border: none
+         }
+
+         .word-modal-btn.practice.active {
+             background: linear-gradient(135deg, #6366F1, #4F46E5);
+         }
+
+         .word-modal-btn.practice:hover {
+             box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4)
+         }
+
+         .word-modal-btn.quiz {
+             background: linear-gradient(135deg, #6366F1, #4F46E5);
+             color: white;
+             border: none
+         }
+
+         .word-modal-btn.quiz.active {
+             background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+         }
+
+         .word-modal-btn.quiz:hover {
+             box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4)
+         }
 
         .word-modal-btn.delete {
             background: linear-gradient(135deg, #EF4444, #DC2626);
@@ -9997,10 +10025,16 @@
         // Utility Functions
         const $ = id => document.getElementById(id);
         const $$ = selector => document.querySelectorAll(selector);
-        const generateId = () => {
-            // Generate unique bigint ID as string: timestamp (ms) + 5-digit random
-            const random = Math.floor(Math.random() * 100000).toString().padStart(5, '0');
-            return Date.now().toString() + random;
+        // Generate temporary local IDs (negative numbers as strings) for words only
+        let nextLocalId = -1;
+        const generateId = () => (nextLocalId--).toString();
+        // Generate UUID for server-managed entities (categories, groups)
+        const generateUUID = () => {
+            if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+                return crypto.randomUUID();
+            }
+            // Fallback
+            return 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
         };
         const formatDate = d => new Date(d).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
         const today = () => new Date().toDateString();
@@ -10269,18 +10303,21 @@
                     nextReview: Date.now() + 86400000,
                     createdAt: Date.now(),
                     updatedAt: Date.now(),
-                    favorite: false
+                    favorite: false,
+                    practice: false,
+                    quiz: false
                 };
 
-                AppData.words.push(word);
-                AppData.stats.todayProgress++;
-                AppData.stats.activities.unshift({ text: `Added "${word.word}"`, time: Date.now(), type: 'add', xp: 10 });
-                saveData();
+                 AppData.words.push(word);
+                 AppData.stats.todayProgress++;
+                 AppData.stats.activities.unshift({ text: `Added "${word.word}"`, time: Date.now(), type: 'add', xp: 10 });
+                 saveData();
 
-                // Sync to Supabase
-                SyncService.uploadWord(word).catch(err => {
-                    console.error('Background sync failed:', err);
-                });
+                 // Sync word and stats to Supabase
+                 SyncService.uploadWord(word).catch(err => {
+                     console.error('Background word sync failed:', err);
+                 });
+                 SyncService.uploadStats().catch(() => {});
 
                 showToast('Word added successfully!', 'success');
                 form.reset();
@@ -10373,7 +10410,7 @@
                 const name = $('newCategoryName').value.trim();
                 if (!name) return;
                 const color = $('categoryColorPicker').querySelector('.selected')?.dataset.color || colors[0];
-                const cat = { id: generateId(), name, color };
+                const cat = { id: generateUUID(), name, color };
                 AppData.categories.push(cat);
                 selectCategory(cat.id, cat.name, cat.color);
                 $('categoryInlineForm').classList.add('hidden');
@@ -10429,7 +10466,7 @@
                 const name = $('newGroupName').value.trim();
                 if (!name) return;
                 const color = $('groupColorPicker').querySelector('.selected')?.dataset.color || colors[0];
-                const group = { id: generateId(), name, color, desc: $('newGroupDesc').value.trim() };
+                const group = { id: generateUUID(), name, color, desc: $('newGroupDesc').value.trim() };
                 AppData.groups.push(group);
                 selectGroup(group.id, group.name, group.color);
                 $('groupInlineForm').classList.add('hidden');
@@ -11031,26 +11068,38 @@
                     </div>
                     ` : ''}
                     
-                    <div class="word-modal-actions">
-                        <button class="word-modal-btn delete" onclick="deleteWord('${word.id}')">
-                            <svg class="word-modal-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                            </svg>
-                            Delete
-                        </button>
-                        <button class="word-modal-btn edit" onclick="editWord('${word.id}')">
-                            <svg class="word-modal-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                            </svg>
-                            Edit
-                        </button>
-                        <button class="word-modal-btn favorite ${word.favorite ? 'active' : ''}" onclick="toggleFavorite('${word.id}')">
-                            <svg class="word-modal-btn-icon" viewBox="0 0 24 24" fill="${word.favorite ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
-                                <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
-                            </svg>
-                            <span class="favorite-label">${word.favorite ? 'Favorited' : 'Favorite'}</span>
-                        </button>
-                    </div>
+                     <div class="word-modal-actions">
+                         <button class="word-modal-btn delete" onclick="deleteWord('${word.id}')">
+                             <svg class="word-modal-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                 <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                             </svg>
+                             Delete
+                         </button>
+                         <button class="word-modal-btn edit" onclick="editWord('${word.id}')">
+                             <svg class="word-modal-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                 <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                             </svg>
+                             Edit
+                         </button>
+                         <button class="word-modal-btn favorite ${word.favorite ? 'active' : ''}" onclick="toggleFavorite('${word.id}')">
+                             <svg class="word-modal-btn-icon" viewBox="0 0 24 24" fill="${word.favorite ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
+                                 <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                             </svg>
+                             <span class="favorite-label">${word.favorite ? 'Favorited' : 'Favorite'}</span>
+                         </button>
+                         <button class="word-modal-btn practice ${word.practice ? 'active' : ''}" onclick="togglePractice('${word.id}')">
+                             <svg class="word-modal-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                 <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                             </svg>
+                             <span>${word.practice ? 'Practicing' : 'Practice'}</span>
+                         </button>
+                         <button class="word-modal-btn quiz ${word.quiz ? 'active' : ''}" onclick="toggleQuiz('${word.id}')">
+                             <svg class="word-modal-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                 <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                             </svg>
+                             <span>${word.quiz ? 'Quiz Mode' : 'Quiz'}</span>
+                         </button>
+                     </div>
                 </div>
             </div>
         `;
@@ -11061,7 +11110,8 @@
         };
 
         window.toggleFavorite = id => {
-            const word = AppData.words.find(w => w.id === id);
+            const targetId = String(id);
+            const word = AppData.words.find(w => String(w.id) === targetId);
             if (word) {
                 word.favorite = !word.favorite;
                 word.updatedAt = Date.now();
@@ -11069,11 +11119,43 @@
                 renderWords();
                 const modal = document.querySelector('.word-modal');
                 if (modal) modal.remove();
-                showWordDetail(id);
-
-                // Sync to Supabase
+                showWordDetail(targetId);
                 SyncService.uploadWord(word).catch(err => {
                     console.error('Background favorite sync failed:', err);
+                });
+            }
+        };
+
+        window.togglePractice = id => {
+            const targetId = String(id);
+            const word = AppData.words.find(w => String(w.id) === targetId);
+            if (word) {
+                word.practice = !word.practice;
+                word.updatedAt = Date.now();
+                saveData();
+                renderWords();
+                const modal = document.querySelector('.word-modal');
+                if (modal) modal.remove();
+                showWordDetail(targetId);
+                SyncService.uploadWord(word).catch(err => {
+                    console.error('Background practice sync failed:', err);
+                });
+            }
+        };
+
+        window.toggleQuiz = id => {
+            const targetId = String(id);
+            const word = AppData.words.find(w => String(w.id) === targetId);
+            if (word) {
+                word.quiz = !word.quiz;
+                word.updatedAt = Date.now();
+                saveData();
+                renderWords();
+                const modal = document.querySelector('.word-modal');
+                if (modal) modal.remove();
+                showWordDetail(targetId);
+                SyncService.uploadWord(word).catch(err => {
+                    console.error('Background quiz sync failed:', err);
                 });
             }
         };
@@ -11127,7 +11209,7 @@
                     <p class="confirm-message">Are you sure you want to delete "${wordName}"? This action cannot be undone.</p>
                     <div class="confirm-actions">
                         <button class="confirm-btn cancel" onclick="closeConfirmModal()">Cancel</button>
-                        <button class="confirm-btn delete" onclick="confirmDelete('${id}')">Delete</button>
+                        <button class="confirm-btn delete" onclick="performDelete('${id}')">Delete</button>
                     </div>
                 </div>
             `;
@@ -11141,21 +11223,24 @@
             document.querySelector('.modal-overlay')?.remove();
         };
 
-        window.confirmDelete = async id => {
-            AppData.words = AppData.words.filter(w => w.id !== id);
-            saveData();
-            closeConfirmModal();
-            renderWords();
-            updateHome();
-            showToast('Word deleted', 'warning');
+         window.performDelete = async id => {
+             const word = AppData.words.find(w => w.id === id);
+             AppData.words = AppData.words.filter(w => w.id !== id);
+             saveData();
+             closeConfirmModal();
+             renderWords();
+             updateHome();
+             showToast('Word deleted', 'warning');
 
-            // Sync delete to Supabase
-            if (currentUser) {
-                SyncService.deleteWordFromServer(id).catch(err => {
-                    console.error('Background delete sync failed:', err);
-                });
-            }
-        };
+             // Sync delete to Supabase only if word has been synced (positive numeric ID)
+             if (currentUser && word && parseInt(word.id) > 0) {
+                 SyncService.deleteWordFromServer(word.id).catch(err => {
+                     console.error('Background delete sync failed:', err);
+                 });
+             }
+             // Sync updated stats (total words count)
+             SyncService.uploadStats().catch(() => {});
+         };
 
         window.editWord = wordId => {
             const word = AppData.words.find(w => w.id === wordId);
@@ -11939,15 +12024,17 @@
                 }
             }
 
-            AppData.stats.activities.unshift({
-                text: `Scored ${accuracy}% on ${quizState.mode} quiz`,
-                time: Date.now(),
-                type: 'quiz',
-                xp: quizState.sessionXP
-            });
+             AppData.stats.activities.unshift({
+                 text: `Scored ${accuracy}% on ${quizState.mode} quiz`,
+                 time: Date.now(),
+                 type: 'quiz',
+                 xp: quizState.sessionXP
+             });
 
-            saveData();
-        }
+             saveData();
+             // Sync updated stats to Supabase
+             SyncService.uploadStats().catch(() => {});
+         }
 
         function createSoftConfetti() {
             const container = $('softConfettiContainer');
@@ -12031,14 +12118,16 @@
             $('importFileInput').addEventListener('change', e => handleImport(e.target.files[0]));
 
             // Danger zone
-            $('resetStatsBtn').addEventListener('click', () => {
-                if (confirm('Reset all statistics? This cannot be undone.')) {
-                    AppData.stats = { totalQuizzes: 0, correctAnswers: 0, totalAnswers: 0, streakDays: 0, bestStreak: 0, lastQuizDate: null, xp: 0, level: 1, dailyGoal: 10, todayProgress: 0, activities: [] };
-                    saveData();
-                    updateStats();
-                    showToast('Statistics reset');
-                }
-            });
+             $('resetStatsBtn').addEventListener('click', () => {
+                 if (confirm('Reset all statistics? This cannot be undone.')) {
+                     AppData.stats = { totalQuizzes: 0, correctAnswers: 0, totalAnswers: 0, streakDays: 0, bestStreak: 0, lastQuizDate: null, xp: 0, level: 1, dailyGoal: 10, todayProgress: 0, activities: [] };
+                     saveData();
+                     updateStats();
+                     showToast('Statistics reset');
+                     // Sync reset to server
+                     SyncService.uploadStats().catch(() => {});
+                 }
+             });
 
             $('deleteAllBtn').addEventListener('click', async () => {
                 if (confirm('DELETE ALL WORDS? This is irreversible!')) {
@@ -12055,10 +12144,12 @@
                             showToast('Server delete failed - will clear locally', 'warning');
                         }
                     }
-                    AppData.words = [];
-                    saveData();
-                    updateStats();
-                    showToast('All words deleted', 'error');
+                     AppData.words = [];
+                     saveData();
+                     updateStats();
+                     showToast('All words deleted', 'error');
+                     // Sync stats (word count) to server
+                     SyncService.uploadStats().catch(() => {});
                 }
             });
 
@@ -12097,14 +12188,17 @@
                                     skipCount++;
                                     return;
                                 }
-                                AppData.words.push({
-                                    ...word,
-                                    id: generateId(),
-                                    mastery: word.mastery || 0,
-                                    createdAt: word.createdAt || Date.now(),
-                                    updatedAt: word.updatedAt || Date.now(),
-                                    nextReview: Date.now() + 86400000
-                                });
+                                 AppData.words.push({
+                                     ...word,
+                                     id: generateId(),
+                                     mastery: word.mastery || 0,
+                                     createdAt: word.createdAt || Date.now(),
+                                     updatedAt: word.updatedAt || Date.now(),
+                                     nextReview: Date.now() + 86400000,
+                                     favorite: false,
+                                     practice: false,
+                                     quiz: false
+                                 });
                                 importCount++;
                             });
                         } else {
@@ -12130,29 +12224,35 @@
                             const categoryId = (values[5] || 'general').toString().toLowerCase().replace(/\s+/g, '_');
 
                             // Auto-create category if not exists
-                            if (!AppData.categories.find(c => c.id === categoryId || c.name.toLowerCase() === (values[5] || 'general').toString().toLowerCase())) {
-                                const catColors = ['#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899', '#6B7280', '#14B8A6', '#F97316'];
-                                AppData.categories.push({
-                                    id: categoryId,
-                                    name: values[5] || 'General',
-                                    color: catColors[AppData.categories.length % catColors.length]
-                                });
-                            }
+                                 if (!AppData.categories.find(c => c.id === categoryId || c.name.toLowerCase() === (values[5] || 'general').toString().toLowerCase())) {
+                                     const catColors = ['#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899', '#6B7280', '#14B8A6', '#F97316'];
+                                     const newCat = {
+                                         id: categoryId,
+                                         name: values[5] || 'General',
+                                         color: catColors[AppData.categories.length % catColors.length]
+                                     };
+                                     AppData.categories.push(newCat);
+                                     // Sync new category
+                                     SyncService.uploadCategory(newCat).catch(() => {});
+                                 }
 
-                            // Auto-create group if not exists
-                            if (values[6]) {
-                                const groupName = values[6].toString();
-                                const groupId = groupName.toLowerCase().replace(/\s+/g, '_');
-                                if (!AppData.groups.find(g => g.id === groupId || g.name.toLowerCase() === groupName.toLowerCase())) {
-                                    const groupColors = ['#6B7280', '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#14B8A6', '#F97316', '#6366F1'];
-                                    AppData.groups.push({
-                                        id: groupId,
-                                        name: groupName,
-                                        color: groupColors[AppData.groups.length % groupColors.length],
-                                        desc: ''
-                                    });
-                                }
-                            }
+                             // Auto-create group if not exists
+                             if (values[6]) {
+                                 const groupName = values[6].toString();
+                                 const groupId = groupName.toLowerCase().replace(/\s+/g, '_');
+                                 if (!AppData.groups.find(g => g.id === groupId || g.name.toLowerCase() === groupName.toLowerCase())) {
+                                     const groupColors = ['#6B7280', '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#14B8A6', '#F97316', '#6366F1'];
+                                     const newGroup = {
+                                         id: groupId,
+                                         name: groupName,
+                                         color: groupColors[AppData.groups.length % groupColors.length],
+                                         desc: ''
+                                     };
+                                     AppData.groups.push(newGroup);
+                                     // Sync new group
+                                     SyncService.uploadGroup(newGroup).catch(() => {});
+                                 }
+                             }
 
                             AppData.words.push({
                                 id: generateId(),
@@ -12166,7 +12266,10 @@
                                 mastery: parseInt(values[7]) || 0,
                                 createdAt: Date.now(),
                                 updatedAt: Date.now(),
-                                nextReview: Date.now() + 86400000
+                                nextReview: Date.now() + 86400000,
+                                favorite: false,
+                                practice: false,
+                                quiz: false
                             });
                             importCount++;
                         }
@@ -12194,29 +12297,35 @@
                             const categoryId = (row[5] || 'general').toString().toLowerCase().replace(/\s+/g, '_');
                             const groupName = row[6] ? row[6].toString() : null;
 
-                            // Auto-create category if not exists
-                            if (!AppData.categories.find(c => c.id === categoryId || c.name.toLowerCase() === (row[5] || 'general').toString().toLowerCase())) {
-                                const catColors = ['#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899', '#6B7280', '#14B8A6', '#F97316'];
-                                AppData.categories.push({
-                                    id: categoryId,
-                                    name: row[5] || 'General',
-                                    color: catColors[AppData.categories.length % catColors.length]
-                                });
-                            }
+                             // Auto-create category if not exists
+                             if (!AppData.categories.find(c => c.id === categoryId || c.name.toLowerCase() === (row[5] || 'general').toString().toLowerCase())) {
+                                 const catColors = ['#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899', '#6B7280', '#14B8A6', '#F97316'];
+                                 const newCat = {
+                                     id: categoryId,
+                                     name: row[5] || 'General',
+                                     color: catColors[AppData.categories.length % catColors.length]
+                                 };
+                                 AppData.categories.push(newCat);
+                                 // Sync new category
+                                 SyncService.uploadCategory(newCat).catch(() => {});
+                             }
 
-                            // Auto-create group if not exists
-                            if (groupName) {
-                                const groupId = groupName.toLowerCase().replace(/\s+/g, '_');
-                                if (!AppData.groups.find(g => g.id === groupId || g.name.toLowerCase() === groupName.toLowerCase())) {
-                                    const groupColors = ['#6B7280', '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#14B8A6', '#F97316', '#6366F1'];
-                                    AppData.groups.push({
-                                        id: groupId,
-                                        name: groupName,
-                                        color: groupColors[AppData.groups.length % groupColors.length],
-                                        desc: ''
-                                    });
-                                }
-                            }
+                             // Auto-create group if not exists
+                             if (groupName) {
+                                 const groupId = groupName.toLowerCase().replace(/\s+/g, '_');
+                                 if (!AppData.groups.find(g => g.id === groupId || g.name.toLowerCase() === groupName.toLowerCase())) {
+                                     const groupColors = ['#6B7280', '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#14B8A6', '#F97316', '#6366F1'];
+                                     const newGroup = {
+                                         id: groupId,
+                                         name: groupName,
+                                         color: groupColors[AppData.groups.length % groupColors.length],
+                                         desc: ''
+                                     };
+                                     AppData.groups.push(newGroup);
+                                     // Sync new group
+                                     SyncService.uploadGroup(newGroup).catch(() => {});
+                                 }
+                             }
 
                              // Map columns: word, definition, bangla, synonyms, example, category, word_group, mastery
                              AppData.words.push({
@@ -12231,7 +12340,10 @@
                                  mastery: parseInt(row[7]) || 0,
                                  createdAt: Date.now(),
                                  updatedAt: Date.now(),
-                                 nextReview: Date.now() + 86400000
+                                 nextReview: Date.now() + 86400000,
+                                 favorite: false,
+                                 practice: false,
+                                 quiz: false
                              });
                             importCount++;
                         }
@@ -12240,25 +12352,59 @@
                     
                     // Upload imported words to Supabase
                     if (currentUser) {
-                        showToast(`Uploading ${importCount} words to server...`, 'warning');
+                        // Show loading overlay
+                        let overlay = document.getElementById('import-loading-overlay');
+                        if (!overlay) {
+                            overlay = document.createElement('div');
+                            overlay.id = 'import-loading-overlay';
+                            overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;justify-content:center;align-items:center;z-index:9999;';
+                            overlay.innerHTML = `
+                                <div style="background:white;padding:30px;border-radius:12px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,0.15);">
+                                    <div style="border:4px solid #f3f3f3;border-top:4px solid #4F46E5;border-radius:50%;width:50px;height:50px;animation:spin 1s linear infinite;margin:0 auto;"></div>
+                                    <p style="margin-top:15px;font-size:16px;color:#374151;font-weight:500;">Uploading ${importCount} words to server...</p>
+                                </div>
+                            `;
+                            // Add spin keyframes if not already added
+                            if (!document.getElementById('spin-keyframes')) {
+                                const style = document.createElement('style');
+                                style.id = 'spin-keyframes';
+                                style.textContent = '@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); }';
+                                document.head.appendChild(style);
+                            }
+                            document.body.appendChild(overlay);
+                        } else {
+                            overlay.style.display = 'flex';
+                        }
+
+                        let allSuccess = true;
                         for (let i = AppData.words.length - importCount; i < AppData.words.length; i++) {
                             const word = AppData.words[i];
                             const success = await SyncService.uploadWord(word);
                             if (!success) {
-                                showToast('Some words failed to upload', 'warning');
+                                allSuccess = false;
                                 break;
                             }
                         }
-                        showToast(`Imported ${importCount} words successfully!`, 'success');
+
+                        // Hide overlay
+                        overlay.style.display = 'none';
+
+                        if (allSuccess) {
+                            showToast(`Imported ${importCount} words successfully!`, 'success');
+                        } else {
+                            showToast('Some words failed to upload', 'warning');
+                        }
                     } else {
                         showToast(`Imported ${importCount} words successfully!`, 'success');
                     }
-                    
-                    if (skipCount > 0) {
-                        showToast(`${skipCount} duplicates skipped.`, 'warning');
-                    }
-                    updateStats();
-                } catch (err) {
+                     
+                     if (skipCount > 0) {
+                         showToast(`${skipCount} duplicates skipped.`, 'warning');
+                     }
+                     updateStats();
+                     // Sync stats to server after import
+                     SyncService.uploadStats().catch(() => {});
+                 } catch (err) {
                     showToast('Import failed: ' + err.message, 'error');
                 }
             };
@@ -12545,13 +12691,15 @@
                         return;
                     }
 
-                    const newCategory = {
-                        id: generateId(),
-                        name: name,
-                        color: selectedColor
-                    };
-                    AppData.categories.push(newCategory);
-                    showToast('Category created!', 'success');
+                     const newCategory = {
+                         id: generateUUID(),
+                         name: name,
+                         color: selectedColor
+                     };
+                     AppData.categories.push(newCategory);
+                     showToast('Category created!', 'success');
+                     // Sync category to Supabase
+                     SyncService.uploadCategory(newCategory).catch(() => {});
                 } else if (modalAction === 'edit' && modalEditId) {
                     const category = AppData.categories.find(c => c.id === modalEditId);
                     if (category) {
@@ -12560,9 +12708,11 @@
                             showToast('Category name already exists', 'error');
                             return;
                         }
-                        category.name = name;
-                        category.color = selectedColor;
-                        showToast('Category updated!', 'success');
+                         category.name = name;
+                         category.color = selectedColor;
+                         showToast('Category updated!', 'success');
+                         // Sync category update to Supabase
+                         SyncService.uploadCategory(category).catch(() => {});
                     }
                 }
             } else if (modalMode === 'group') {
@@ -12574,12 +12724,14 @@
                     }
 
                     const newGroup = {
-                        id: generateId(),
+                        id: generateUUID(),
                         name: name,
                         color: selectedColor
                     };
-                    AppData.groups.push(newGroup);
-                    showToast('Word group created!', 'success');
+                     AppData.groups.push(newGroup);
+                     showToast('Word group created!', 'success');
+                     // Sync group to Supabase
+                     SyncService.uploadGroup(newGroup).catch(() => {});
                 } else if (modalAction === 'edit' && modalEditId) {
                     const group = AppData.groups.find(g => g.id === modalEditId);
                     if (group) {
@@ -12588,9 +12740,11 @@
                             showToast('Group name already exists', 'error');
                             return;
                         }
-                        group.name = name;
-                        group.color = selectedColor;
-                        showToast('Word group updated!', 'success');
+                         group.name = name;
+                         group.color = selectedColor;
+                         showToast('Word group updated!', 'success');
+                         // Sync group update to Supabase
+                         SyncService.uploadGroup(group).catch(() => {});
                     }
                 }
             }
@@ -12608,57 +12762,71 @@
             openManageModal('group', 'edit', id);
         }
 
-        function deleteCategory(id) {
-            const category = AppData.categories.find(c => c.id === id);
-            if (!category) return;
+         function deleteCategory(id) {
+             const category = AppData.categories.find(c => c.id === id);
+             if (!category) return;
 
-            const wordCount = AppData.words.filter(w => w.category === id).length;
-            let confirmMsg = `Delete "${category.name}"?`;
-            if (wordCount > 0) {
-                confirmMsg += `\n\n${wordCount} word${wordCount !== 1 ? 's' : ''} will be moved to "Uncategorized".`;
-            }
+             const wordCount = AppData.words.filter(w => w.category === id).length;
+             let confirmMsg = `Delete "${category.name}"?`;
+             if (wordCount > 0) {
+                 confirmMsg += `\n\n${wordCount} word${wordCount !== 1 ? 's' : ''} will be moved to "Uncategorized".`;
+             }
 
-            if (confirm(confirmMsg)) {
-                // Move words to uncategorized (general)
-                AppData.words.forEach(w => {
-                    if (w.category === id) {
-                        w.category = 'general';
-                    }
-                });
+             if (confirm(confirmMsg)) {
+                 // Move words to uncategorized (general)
+                 const affectedWords = [];
+                 AppData.words.forEach(w => {
+                     if (w.category === id) {
+                         w.category = 'general';
+                         affectedWords.push(w);
+                     }
+                 });
 
-                // Remove category
-                AppData.categories = AppData.categories.filter(c => c.id !== id);
-                saveData();
-                updateStats();
-                showToast('Category deleted', 'success');
-            }
-        }
+                 // Remove category
+                 AppData.categories = AppData.categories.filter(c => c.id !== id);
+                 saveData();
+                 updateStats();
+                 showToast('Category deleted', 'success');
 
-        function deleteGroup(id) {
-            const group = AppData.groups.find(g => g.id === id);
-            if (!group) return;
+                 // Sync affected words to server
+                 affectedWords.forEach(w => SyncService.uploadWord(w).catch(() => {}));
+                 // Delete category from server
+                 SyncService.deleteCategoryFromServer(id).catch(() => {});
+             }
+         }
 
-            const wordCount = AppData.words.filter(w => w.group === id).length;
-            let confirmMsg = `Delete "${group.name}"?`;
-            if (wordCount > 0) {
-                confirmMsg += `\n\n${wordCount} word${wordCount !== 1 ? 's' : ''} will be removed from this group.`;
-            }
+         function deleteGroup(id) {
+             const group = AppData.groups.find(g => g.id === id);
+             if (!group) return;
 
-            if (confirm(confirmMsg)) {
-                // Remove group from words
-                AppData.words.forEach(w => {
-                    if (w.group === id) {
-                        w.group = null;
-                    }
-                });
+             const wordCount = AppData.words.filter(w => w.group === id).length;
+             let confirmMsg = `Delete "${group.name}"?`;
+             if (wordCount > 0) {
+                 confirmMsg += `\n\n${wordCount} word${wordCount !== 1 ? 's' : ''} will be removed from this group.`;
+             }
 
-                // Remove group
-                AppData.groups = AppData.groups.filter(g => g.id !== id);
-                saveData();
-                updateStats();
-                showToast('Word group deleted', 'success');
-            }
-        }
+             if (confirm(confirmMsg)) {
+                 // Remove group from words
+                 const affectedWords = [];
+                 AppData.words.forEach(w => {
+                     if (w.group === id) {
+                         w.group = null;
+                         affectedWords.push(w);
+                     }
+                 });
+
+                 // Remove group
+                 AppData.groups = AppData.groups.filter(g => g.id !== id);
+                 saveData();
+                 updateStats();
+                 showToast('Word group deleted', 'success');
+
+                 // Sync affected words to server
+                 affectedWords.forEach(w => SyncService.uploadWord(w).catch(() => {}));
+                 // Delete group from server
+                 SyncService.deleteGroupFromServer(id).catch(() => {});
+             }
+         }
 
         // Close modal on overlay click
         $('manageModal')?.addEventListener('click', (e) => {
@@ -12784,6 +12952,7 @@
         }
 
         async function signOut() {
+            SyncService.cleanup();
             const { error } = await supabaseClient.auth.signOut();
             if (error) console.error('Logout error:', error);
             localStorage.removeItem(STORAGE_KEY);
@@ -12920,23 +13089,28 @@
         const SyncService = {
             initialized: false,
             syncInProgress: false,
+            channels: [],
 
             async initialize(user) {
                 if (this.initialized) return;
                 console.log('🔄 Initializing sync for user:', user.id);
 
                 try {
-                    // Load remote data from Supabase
-                    await this.downloadFromSupabase();
+                    // Load all data from Supabase in sequence
+                    await this.downloadWords();
+                    await this.downloadProfile();
+                    await this.downloadCategories();
+                    await this.downloadGroups();
                     this.setupRealtimeSubscription();
                     this.initialized = true;
                     console.log('✅ Sync service ready');
+                    refreshCurrentView();
                 } catch (err) {
                     console.error('❌ Sync initialization failed:', err);
                 }
             },
 
-            async downloadFromSupabase() {
+            async downloadWords() {
                 if (!currentUser) return;
 
                 console.log('📥 Downloading words from Supabase...');
@@ -12946,52 +13120,55 @@
                     .order('id', { ascending: false });
 
                 if (error) {
-                    console.error('Download error:', error);
+                    console.error('Download words error:', error);
                     return;
                 }
 
                 if (data && data.length > 0) {
                     const remoteWords = data.map(w => this.mapSupabaseWordToLocal(w));
                     console.log(`📥 Loaded ${remoteWords.length} words from server`);
-
-                    // Server-only mode: replace local words with server data
                     AppData.words = remoteWords;
-                    updateHome(); // Update word count display
-                    console.log(`✅ Loaded ${AppData.words.length} words from server`);
                 } else {
                     console.log('ℹ️ No words on server');
                     AppData.words = [];
-                    updateHome();
                 }
             },
 
             async uploadWord(word) {
                 if (!currentUser) return;
 
-                const wordForSupabase = {
-                    id: word.id,
-                    user_id: currentUser.id,
-                    word: word.word,
-                    definition: word.definition || null,
-                    bangla: word.bangla || null,
-                    synonyms: JSON.stringify(word.synonyms || []),
-                    example: word.example || null,
-                    category: word.category || 'general',
-                    "group": word.group || null,
-                    mastery: word.mastery || 0,
-                    favorite: word.favorite || false,
-                    word_xp: word.xp || 0,
-                    added_date: word.addedDate || new Date().toISOString().split('T')[0],
-                    next_review_date: word.nextReview ? new Date(word.nextReview).toISOString() : null,
-                    created_at: word.createdAt ? new Date(word.createdAt).toISOString() : new Date().toISOString(),
-                    updated_at: word.updatedAt ? new Date(word.updatedAt).toISOString() : new Date().toISOString()
-                };
+                 // Use word name + user_id as natural key for conflict resolution
+                 const wordForSupabase = {
+                     user_id: currentUser.id,
+                     client_id: this.getClientId(),
+                     word: word.word,
+                     definition: word.definition || null,
+                     bangla: word.bangla || null,
+                     synonyms: word.synonyms || [],
+                     example: word.example || null,
+                     category: word.category || 'general',
+                     "group": word.group || null,
+                     mastery: word.mastery || 0,
+                     favorite: word.favorite || false,
+                     practice: word.practice || false,
+                     quiz: word.quiz || false,
+                     word_xp: word.xp || 0,
+                     added_date: word.addedDate || new Date().toISOString().split('T')[0],
+                     next_review_date: word.nextReview ? new Date(word.nextReview).toISOString() : null,
+                     created_at: word.createdAt ? new Date(word.createdAt).toISOString() : new Date().toISOString(),
+                     updated_at: word.updatedAt ? new Date(word.updatedAt).toISOString() : new Date().toISOString()
+                 };
 
-                console.log('📤 Uploading word:', word.word, wordForSupabase);
+                console.log('📤 Uploading word:', word.word, 'favorite:', word.favorite);
                 
-                const { error } = await supabaseClient
+                // Use upsert with word name + user_id as conflict target
+                const { data, error } = await supabaseClient
                     .from('words')
-                    .upsert(wordForSupabase);
+                    .upsert(wordForSupabase, { 
+                        onConflict: ['word', 'user_id'],
+                        ignoreDuplicates: false 
+                    })
+                    .select();
 
                 if (error) {
                     console.error('Upload error:', error);
@@ -12999,8 +13176,17 @@
                     return false;
                 }
 
-                console.log('✅ Word synced to server');
-                return true;
+                 // Update local word with Supabase-generated ID if available
+                 if (data && data.length > 0 && data[0].id) {
+                     word.id = String(data[0].id);
+                     console.log('✅ Word synced with new id:', word.id);
+                 } else {
+                     console.log('✅ Word synced to server');
+                 }
+
+                 // Refresh UI to reflect any ID changes and sync state
+                 refreshCurrentView();
+                 return true;
             },
 
             async deleteWordFromServer(wordId) {
@@ -13023,110 +13209,440 @@
                 return true;
             },
 
+            // Categories
+            async downloadCategories() {
+                if (!currentUser) return;
+                const { data, error } = await supabaseClient
+                    .from('categories')
+                    .select('*')
+                    .eq('user_id', currentUser.id);
+
+                if (error) {
+                    console.error('Download categories error:', error);
+                    return;
+                }
+
+                if (data && data.length > 0) {
+                    AppData.categories = data;
+                    console.log(`📥 Loaded ${data.length} categories`);
+                } else {
+                    // No categories on server: upload default 'general' category to server
+                    const defaultCat = { id: 'general', name: 'General', color: '#6B7280' };
+                    // Ensure local default exists
+                    if (!AppData.categories.some(c => c.id === 'general')) {
+                        AppData.categories.push(defaultCat);
+                    }
+                    // Upload to server (idempotent)
+                    this.uploadCategory(defaultCat).catch(() => {});
+                }
+                refreshCurrentView();
+            },
+
+            async uploadCategory(category) {
+                if (!currentUser) return;
+                const payload = {
+                    id: category.id,
+                    user_id: currentUser.id,
+                    name: category.name,
+                    color: category.color,
+                    client_id: this.getClientId()
+                };
+                const { error } = await supabaseClient
+                    .from('categories')
+                    .upsert(payload, { onConflict: ['id', 'user_id'] });
+
+                if (error) {
+                    console.error('Category upload error:', error);
+                    showToast('Failed to save category', 'warning');
+                    return false;
+                }
+                console.log('✅ Category synced:', category.name);
+                refreshCurrentView();
+                return true;
+            },
+
+            async deleteCategoryFromServer(categoryId) {
+                if (!currentUser) return;
+                const { error } = await supabaseClient
+                    .from('categories')
+                    .delete()
+                    .eq('id', categoryId)
+                    .eq('user_id', currentUser.id);
+                if (error) console.error('Delete category error:', error);
+            },
+
+            // Groups
+            async downloadGroups() {
+                if (!currentUser) return;
+                const { data, error } = await supabaseClient
+                    .from('groups')
+                    .select('*')
+                    .eq('user_id', currentUser.id);
+
+                if (error) {
+                    console.error('Download groups error:', error);
+                    return;
+                }
+
+                if (data && data.length > 0) {
+                    // Map server fields (description) to local property (desc)
+                    AppData.groups = data.map(g => ({
+                        id: g.id,
+                        name: g.name,
+                        color: g.color,
+                        desc: g.description || ''
+                    }));
+                    console.log(`📥 Loaded ${data.length} groups`);
+                } else {
+                    // No groups on server: upload default 'default' group to server
+                    const defaultGroup = { id: 'default', name: 'Default', color: '#6B7280', desc: '' };
+                    // Ensure local default exists
+                    if (!AppData.groups.some(g => g.id === 'default')) {
+                        AppData.groups.push(defaultGroup);
+                    }
+                    // Upload to server (idempotent)
+                    this.uploadGroup(defaultGroup).catch(() => {});
+                }
+                refreshCurrentView();
+            },
+
+            async uploadGroup(group) {
+                if (!currentUser) return;
+                const payload = {
+                    id: group.id,
+                    user_id: currentUser.id,
+                    name: group.name,
+                    color: group.color,
+                    description: group.desc || '',
+                    client_id: this.getClientId()
+                };
+                const { error } = await supabaseClient
+                    .from('groups')
+                    .upsert(payload, { onConflict: ['id', 'user_id'] });
+
+                if (error) {
+                    console.error('Group upload error:', error);
+                    showToast('Failed to save group', 'warning');
+                    return false;
+                }
+                console.log('✅ Group synced:', group.name);
+                refreshCurrentView();
+                return true;
+            },
+
+            async deleteGroupFromServer(groupId) {
+                if (!currentUser) return;
+                const { error } = await supabaseClient
+                    .from('groups')
+                    .delete()
+                    .eq('id', groupId)
+                    .eq('user_id', currentUser.id);
+                if (error) console.error('Delete group error:', error);
+            },
+
+            // Stats (profiles)
+            async downloadProfile() {
+                if (!currentUser) return;
+                const { data, error } = await supabaseClient
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', currentUser.id)
+                    .single();
+
+                if (error) {
+                    if (error.code !== 'PGRST116') { // not found
+                        console.error('Download profile error:', error);
+                    }
+                    // Create default profile by uploading stats
+                    await this.uploadStats();
+                    return;
+                }
+
+                if (data) {
+                    AppData.stats.xp = data.xp || 0;
+                    AppData.stats.streakDays = data.streak || 0;
+                    AppData.stats.bestStreak = data.best_streak || 0;
+                    AppData.stats.totalWords = data.total_words_learned || 0;
+                    AppData.stats.level = data.level || 1;
+                    AppData.stats.dailyGoal = data.daily_goal || 10;
+                    AppData.stats.todayProgress = data.today_progress || 0;
+                    AppData.stats.lastQuizDate = data.last_quiz_date || null;
+                    AppData.stats.totalQuizzes = data.total_quizzes || 0;
+                    AppData.stats.correctAnswers = data.correct_answers || 0;
+                    AppData.stats.totalAnswers = data.total_answers || 0;
+                    if (data.activities && Array.isArray(data.activities)) {
+                        AppData.stats.activities = data.activities;
+                    }
+                    console.log('📥 Loaded profile stats');
+                }
+            },
+
+            async uploadStats() {
+                if (!currentUser) return;
+                const totalWords = AppData.words.length;
+                const stats = AppData.stats;
+                const payload = {
+                    id: currentUser.id,
+                    xp: stats.xp,
+                    streak: stats.streakDays,
+                    best_streak: stats.bestStreak,
+                    total_words_learned: totalWords,
+                    level: stats.level,
+                    daily_goal: stats.dailyGoal,
+                    today_progress: stats.todayProgress,
+                    last_quiz_date: stats.lastQuizDate,
+                    total_quizzes: stats.totalQuizzes,
+                    correct_answers: stats.correctAnswers,
+                    total_answers: stats.totalAnswers,
+                    activities: stats.activities,
+                    client_id: this.getClientId(),
+                    last_active_at: new Date().toISOString()
+                };
+                const { error } = await supabaseClient
+                    .from('profiles')
+                    .upsert(payload, { onConflict: 'id' });
+
+                if (error) {
+                    console.error('Upload stats error:', error);
+                    return false;
+                }
+                console.log('✅ Stats synced');
+                return true;
+            },
+
             setupRealtimeSubscription() {
                 if (!currentUser) return;
 
-                console.log('👂 Setting up realtime subscription...');
-                realtimeSubscription = supabaseClient
-                    .channel('words-changes')
-                    .on(
-                        'postgres_changes',
-                        {
-                            event: '*',
-                            schema: 'public',
-                            table: 'words',
-                            filter: `user_id=eq.${currentUser.id}`
-                        },
-                        (payload) => {
-                            console.log('📡 Realtime event:', payload.eventType, payload);
-                            this.handleRealtimeEvent(payload);
-                        }
-                    )
-                    .subscribe((status) => {
-                        console.log('Realtime subscription status:', status);
-                    });
+                console.log('👂 Setting up realtime subscriptions for all entities...');
+                this.channels = [];
+
+                const channels = [
+                    supabaseClient.channel('words-changes')
+                        .on('postgres_changes', { event: '*', schema: 'public', table: 'words', filter: `user_id=eq.${currentUser.id}` }, (payload) => this.handleRealtimeEvent(payload, 'word')),
+                    supabaseClient.channel('categories-changes')
+                        .on('postgres_changes', { event: '*', schema: 'public', table: 'categories', filter: `user_id=eq.${currentUser.id}` }, (payload) => this.handleRealtimeEvent(payload, 'category')),
+                    supabaseClient.channel('groups-changes')
+                        .on('postgres_changes', { event: '*', schema: 'public', table: 'groups', filter: `user_id=eq.${currentUser.id}` }, (payload) => this.handleRealtimeEvent(payload, 'group')),
+                    supabaseClient.channel('profiles-changes')
+                        .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles', filter: `id=eq.${currentUser.id}` }, (payload) => this.handleRealtimeEvent(payload, 'profile')),
+                    supabaseClient.channel('study-sessions-changes')
+                        .on('postgres_changes', { event: '*', schema: 'public', table: 'study_sessions', filter: `user_id=eq.${currentUser.id}` }, (payload) => this.handleRealtimeEvent(payload, 'study_session')),
+                    supabaseClient.channel('word-progress-changes')
+                        .on('postgres_changes', { event: '*', schema: 'public', table: 'user_word_progress', filter: `user_id=eq.${currentUser.id}` }, (payload) => this.handleRealtimeEvent(payload, 'word_progress'))
+                ];
+
+                // Subscribe all channels
+                channels.forEach(channel => {
+                    const sub = channel.subscribe();
+                    this.channels.push(channel);
+                });
+
+                console.log('✅ All realtime subscriptions active');
             },
 
-            handleRealtimeEvent(payload) {
+            handleRealtimeEvent(payload, entityType) {
                 if (!currentUser) return;
 
                 const { eventType, new: newRow, old: oldRow } = payload;
                 const myClientId = this.getClientId();
 
-                // Ignore changes from this client
-                if (newRow && newRow.client_id === myClientId) {
-                    return;
-                }
-                if (oldRow && oldRow.client_id === myClientId) {
-                    return;
-                }
+                // Ignore changes from this client (for words with client_id)
+                if (newRow && newRow.client_id === myClientId) return;
+                if (oldRow && oldRow.client_id === myClientId) return;
 
-                switch (eventType) {
-                    case 'INSERT':
-                    case 'UPDATE':
-                        if (newRow && newRow.user_id === currentUser.id) {
-                            const remoteWord = this.mapSupabaseWordToLocal(newRow);
-                            const existingIndex = AppData.words.findIndex(w => w.id === remoteWord.id);
-                            if (existingIndex !== -1) {
-                                const local = AppData.words[existingIndex];
-                                // Remote wins if newer
-                                if (remoteWord.updatedAt > (local.updatedAt || 0)) {
-                                    AppData.words[existingIndex] = remoteWord;
-                                }
-                            } else {
-                                AppData.words.push(remoteWord);
-                            }
-                            saveData();
-                            console.log('✅ Applied remote update');
-                            refreshCurrentView();
-                            showToast('Synced from another device', 'info');
-                        }
+                switch (entityType) {
+                    case 'word':
+                        this.handleWordRealtime(eventType, newRow, oldRow);
                         break;
-
-                    case 'DELETE':
-                        if (oldRow && oldRow.user_id === currentUser.id) {
-                            AppData.words = AppData.words.filter(w => w.id !== oldRow.id);
-                            saveData();
-                            console.log('✅ Applied remote delete');
-                            refreshCurrentView();
-                            showToast('Word deleted on another device', 'info');
-                        }
+                    case 'category':
+                        this.handleCategoryRealtime(eventType, newRow, oldRow);
+                        break;
+                    case 'group':
+                        this.handleGroupRealtime(eventType, newRow, oldRow);
+                        break;
+                    case 'profile':
+                        this.handleProfileRealtime(eventType, newRow, oldRow);
+                        break;
+                    case 'study_session':
+                        this.handleStudySessionRealtime(eventType, newRow, oldRow);
+                        break;
+                    case 'word_progress':
+                        this.handleWordProgressRealtime(eventType, newRow, oldRow);
                         break;
                 }
             },
 
-            mapSupabaseWordToLocal(supabaseWord) {
-                // Parse synonyms - could be JSON string or array
-                let synonyms = [];
-                try {
-                    if (typeof supabaseWord.synonyms === 'string') {
-                        synonyms = JSON.parse(supabaseWord.synonyms);
-                    } else if (Array.isArray(supabaseWord.synonyms)) {
-                        synonyms = supabaseWord.synonyms;
+            handleWordRealtime(eventType, newRow, oldRow) {
+                if (!currentUser) return;
+
+                if (eventType === 'INSERT' || eventType === 'UPDATE') {
+                    if (newRow && newRow.user_id === currentUser.id) {
+                        const remoteWord = this.mapSupabaseWordToLocal(newRow);
+                        let existingIndex = AppData.words.findIndex(w => String(w.id) === String(remoteWord.id));
+                        if (existingIndex === -1) {
+                            existingIndex = AppData.words.findIndex(w => w.word === remoteWord.word && w.user_id === currentUser.id);
+                        }
+                        if (existingIndex !== -1) {
+                            AppData.words[existingIndex] = remoteWord;
+                        } else {
+                            AppData.words.push(remoteWord);
+                        }
+                        saveData();
+                        refreshCurrentView();
+                        showToast('Word synced from another device', 'info');
                     }
-                } catch (e) {
-                    synonyms = [];
+                } else if (eventType === 'DELETE') {
+                    if (oldRow && oldRow.user_id === currentUser.id) {
+                        AppData.words = AppData.words.filter(w => String(w.id) !== String(oldRow.id));
+                        saveData();
+                        refreshCurrentView();
+                        showToast('Word deleted on another device', 'info');
+                    }
                 }
-                
-                return {
-                    id: String(supabaseWord.id || supabaseWord.id),
-                    word: supabaseWord.word || '',
-                    definition: supabaseWord.definition || '',
-                    bangla: supabaseWord.bangla || '',
-                    synonyms: synonyms,
-                    example: supabaseWord.example || '',
-                    category: supabaseWord.category || 'general',
-                    group: 'default',
-                    mastery: supabaseWord.mastery || 0,
-                    favorite: supabaseWord.favorite || false,
-                    xp: supabaseWord.word_xp || 0,
-                    addedDate: supabaseWord.added_date || new Date().toISOString().split('T')[0],
-                    nextReview: supabaseWord.next_review_date ? new Date(supabaseWord.next_review_date).getTime() : null,
-                    createdAt: supabaseWord.created_at ? new Date(supabaseWord.created_at).getTime() : Date.now(),
-                    updatedAt: supabaseWord.updated_at ? new Date(supabaseWord.updated_at).getTime() : Date.now(),
-                    favorite: false
-                };
             },
+
+            handleCategoryRealtime(eventType, newRow, oldRow) {
+                if (!currentUser) return;
+                const myClientId = this.getClientId();
+
+                // Ignore own changes
+                if (newRow && newRow.client_id === myClientId) return;
+                if (oldRow && oldRow.client_id === myClientId) return;
+
+                if (eventType === 'INSERT' || eventType === 'UPDATE') {
+                    if (newRow && newRow.user_id === currentUser.id) {
+                        const existingIndex = AppData.categories.findIndex(c => c.id === newRow.id);
+                        const remoteCat = { id: newRow.id, name: newRow.name, color: newRow.color };
+                        if (existingIndex !== -1) {
+                            AppData.categories[existingIndex] = remoteCat;
+                        } else {
+                            AppData.categories.push(remoteCat);
+                        }
+                        saveData();
+                        refreshCurrentView();
+                        showToast('Category updated from another device', 'info');
+                    }
+                } else if (eventType === 'DELETE') {
+                    if (oldRow && oldRow.user_id === currentUser.id) {
+                        AppData.categories = AppData.categories.filter(c => c.id !== oldRow.id);
+                        saveData();
+                        refreshCurrentView();
+                        showToast('Category deleted on another device', 'info');
+                    }
+                }
+            },
+
+            handleGroupRealtime(eventType, newRow, oldRow) {
+                if (!currentUser) return;
+                const myClientId = this.getClientId();
+
+                // Ignore own changes
+                if (newRow && newRow.client_id === myClientId) return;
+                if (oldRow && oldRow.client_id === myClientId) return;
+
+                if (eventType === 'INSERT' || eventType === 'UPDATE') {
+                    if (newRow && newRow.user_id === currentUser.id) {
+                        const existingIndex = AppData.groups.findIndex(g => g.id === newRow.id);
+                        const remoteGroup = { id: newRow.id, name: newRow.name, color: newRow.color, desc: newRow.description || '' };
+                        if (existingIndex !== -1) {
+                            AppData.groups[existingIndex] = remoteGroup;
+                        } else {
+                            AppData.groups.push(remoteGroup);
+                        }
+                        saveData();
+                        refreshCurrentView();
+                        showToast('Group updated from another device', 'info');
+                    }
+                } else if (eventType === 'DELETE') {
+                    if (oldRow && oldRow.user_id === currentUser.id) {
+                        AppData.groups = AppData.groups.filter(g => g.id !== oldRow.id);
+                        saveData();
+                        refreshCurrentView();
+                        showToast('Group deleted on another device', 'info');
+                    }
+                }
+            },
+
+            handleProfileRealtime(eventType, newRow, oldRow) {
+                if (!currentUser) return;
+                const myClientId = this.getClientId();
+
+                // Ignore own changes
+                if (newRow && newRow.client_id === myClientId) return;
+                if (oldRow && oldRow.client_id === myClientId) return;
+
+                if (eventType === 'INSERT' || eventType === 'UPDATE') {
+                    if (newRow && newRow.id === currentUser.id) {
+                        AppData.stats.xp = newRow.xp || 0;
+                        AppData.stats.streakDays = newRow.streak || 0;
+                        AppData.stats.bestStreak = newRow.best_streak || 0;
+                        AppData.stats.totalWords = newRow.total_words_learned || 0;
+                        AppData.stats.level = newRow.level || 1;
+                        AppData.stats.dailyGoal = newRow.daily_goal || 10;
+                        AppData.stats.todayProgress = newRow.today_progress || 0;
+                        AppData.stats.lastQuizDate = newRow.last_quiz_date || null;
+                        AppData.stats.totalQuizzes = newRow.total_quizzes || 0;
+                        AppData.stats.correctAnswers = newRow.correct_answers || 0;
+                        AppData.stats.totalAnswers = newRow.total_answers || 0;
+                        if (newRow.activities && Array.isArray(newRow.activities)) {
+                            AppData.stats.activities = newRow.activities;
+                        }
+                        saveData();
+                        refreshCurrentView();
+                        showToast('Profile updated from another device', 'info');
+                    }
+                }
+            },
+
+            handleStudySessionRealtime(eventType, newRow, oldRow) {
+                // Study sessions are append-only; no UI update needed for now
+                console.log('📡 Study session synced from another device');
+            },
+
+            handleWordProgressRealtime(eventType, newRow, oldRow) {
+                // Word progress updates will be reflected via word realtime (since mastery changes)
+                console.log('📡 Word progress synced from another device');
+            },
+
+             mapSupabaseWordToLocal(supabaseWord) {
+                 // Parse synonyms - could be JSON string or array
+                 let synonyms = [];
+                 try {
+                     if (typeof supabaseWord.synonyms === 'string') {
+                         synonyms = JSON.parse(supabaseWord.synonyms);
+                     } else if (Array.isArray(supabaseWord.synonyms)) {
+                         synonyms = supabaseWord.synonyms;
+                     }
+                 } catch (e) {
+                     synonyms = [];
+                 }
+                 
+                 // Ensure ID is always a string
+                 const wordId = supabaseWord.id ? String(supabaseWord.id) : '';
+                 if (!wordId) {
+                     console.error('Word ID is missing from Supabase!', supabaseWord);
+                 }
+                 
+                 return {
+                     id: wordId,
+                     word: supabaseWord.word || '',
+                     definition: supabaseWord.definition || '',
+                     bangla: supabaseWord.bangla || '',
+                     synonyms: synonyms,
+                     example: supabaseWord.example || '',
+                     category: supabaseWord.category || 'general',
+                     group: supabaseWord.group || supabaseWord['group'] || 'default',
+                     mastery: supabaseWord.mastery || 0,
+                     favorite: supabaseWord.favorite || false,
+                     practice: supabaseWord.practice || false,
+                     quiz: supabaseWord.quiz || false,
+                     xp: supabaseWord.word_xp || 0,
+                     addedDate: supabaseWord.added_date ? (typeof supabaseWord.added_date === 'string' ? supabaseWord.added_date : supabaseWord.added_date.toString().split('T')[0]) : new Date().toISOString().split('T')[0],
+                     nextReview: supabaseWord.next_review_date ? new Date(supabaseWord.next_review_date).getTime() : null,
+                     createdAt: supabaseWord.created_at ? new Date(supabaseWord.created_at).getTime() : Date.now(),
+                     updatedAt: supabaseWord.updated_at ? new Date(supabaseWord.updated_at).getTime() : Date.now()
+                 };
+             },
 
             getClientId() {
                 let clientId = localStorage.getItem('vocavera_client_id');
@@ -13138,9 +13654,12 @@
             },
 
             cleanup() {
-                if (realtimeSubscription) {
-                    supabaseClient.removeChannel(realtimeSubscription);
-                    realtimeSubscription = null;
+                // Remove all channels
+                if (this.channels && this.channels.length > 0) {
+                    this.channels.forEach(channel => {
+                        supabaseClient.removeChannel(channel);
+                    });
+                    this.channels = [];
                 }
                 this.initialized = false;
             }
