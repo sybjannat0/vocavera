@@ -259,6 +259,32 @@
             letter-spacing: 4px
         }
 
+        .login-input {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 15px;
+            border: 2px solid #E5E7EB;
+            border-radius: 12px;
+            background: #F9FAFB;
+            color: #111827;
+            transition: all 200ms ease;
+            box-sizing: border-box;
+            outline: none;
+            margin-bottom: 12px;
+        }
+
+        .login-input:focus {
+            border-color: #667EEA;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+        }
+
+        .auth-tab-btn.active {
+            background: white;
+            color: #374151;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
         .login-error {
             margin-top: 16px;
             padding: 12px;
@@ -8201,6 +8227,7 @@
 </head>
 
 <body>
+    <!-- Login Screen -->
     <div id="login-screen" class="hidden">
         <button id="logoutBtn" class="login-logout-btn">Logout</button>
         <div class="login-card">
@@ -8212,10 +8239,31 @@
                 </svg>
             </div>
             <h1 class="login-title">VocaVera</h1>
-            <p class="login-subtitle">Enter your PIN to continue</p>
-            <input type="password" id="pinInput" class="login-pin-input" placeholder="••••" maxlength="6" autocomplete="off" inputmode="numeric">
-            <div id="loginError" class="login-error">Incorrect PIN. Please try again.</div>
-            <p class="login-footer">Session lasts for 1 week</p>
+            <p class="login-subtitle">Sign in to sync across devices</p>
+
+            <!-- Auth Mode Toggle -->
+            <div style="display:flex;gap:8px;margin-bottom:20px;background:#F3F4F6;padding:4px;border-radius:12px;">
+                <button id="loginTab" class="auth-tab-btn active" style="flex:1;padding:10px;border:none;background:white;border-radius:10px;font-weight:600;color:#374151;cursor:pointer;">Login</button>
+                <button id="signupTab" class="auth-tab-btn" style="flex:1;padding:10px;border:none;background:transparent;border-radius:10px;font-weight:600;color:#6B7280;cursor:pointer;">Sign Up</button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="loginForm">
+                <input type="email" id="loginEmail" class="login-input" placeholder="Email" autocomplete="email" required style="width:100%;padding:14px 16px;border:2px solid #E5E7EB;border-radius:12px;font-size:15px;margin-bottom:12px;box-sizing:border-box;outline:none;transition:border-color 200ms;" />
+                <input type="password" id="loginPassword" class="login-input" placeholder="Password" autocomplete="current-password" required style="width:100%;padding:14px 16px;border:2px solid #E5E7EB;border-radius:12px;font-size:15px;margin-bottom:16px;box-sizing:border-box;outline:none;transition:border-color 200ms;" />
+                <button type="submit" id="loginSubmitBtn" class="btn btn-primary" style="width:100%;min-height:48px;font-size:15px;font-weight:600;">Sign In</button>
+            </form>
+
+            <!-- Sign Up Form -->
+            <form id="signupForm" style="display:none;">
+                <input type="email" id="signupEmail" class="login-input" placeholder="Email" autocomplete="email" required style="width:100%;padding:14px 16px;border:2px solid #E5E7EB;border-radius:12px;font-size:15px;margin-bottom:12px;box-sizing:border-box;outline:none;transition:border-color 200ms;" />
+                <input type="password" id="signupPassword" class="login-input" placeholder="Password (min 6 chars)" autocomplete="new-password" required minlength="6" style="width:100%;padding:14px 16px;border:2px solid #E5E7EB;border-radius:12px;font-size:15px;margin-bottom:12px;box-sizing:border-box;outline:none;transition:border-color 200ms;" />
+                <input type="password" id="signupConfirmPassword" class="login-input" placeholder="Confirm Password" autocomplete="new-password" required style="width:100%;padding:14px 16px;border:2px solid #E5E7EB;border-radius:12px;font-size:15px;margin-bottom:16px;box-sizing:border-box;outline:none;transition:border-color 200ms;" />
+                <button type="submit" id="signupSubmitBtn" class="btn btn-primary" style="width:100%;min-height:48px;font-size:15px;font-weight:600;">Create Account</button>
+            </form>
+
+            <div id="loginError" class="login-error" style="display:none;"></div>
+            <p class="login-footer">By signing in, your words will sync across all devices</p>
         </div>
     </div>
 
@@ -9949,21 +9997,27 @@
         // Utility Functions
         const $ = id => document.getElementById(id);
         const $$ = selector => document.querySelectorAll(selector);
-        const generateId = () => Date.now().toString(36) + Math.random().toString(36).substr(2);
+        const generateId = () => {
+            // Generate unique bigint ID as string: timestamp (ms) + 5-digit random
+            const random = Math.floor(Math.random() * 100000).toString().padStart(5, '0');
+            return Date.now().toString() + random;
+        };
         const formatDate = d => new Date(d).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
         const today = () => new Date().toDateString();
 
         // Persistence
         function saveData() {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(AppData));
+            // Disabled localStorage - using Supabase only
+            // localStorage.setItem(STORAGE_KEY, JSON.stringify(AppData));
         }
 
         function loadData() {
-            const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) {
-                const parsed = JSON.parse(saved);
-                Object.assign(AppData, parsed);
-            }
+            // Disabled localStorage - using Supabase only
+            // const saved = localStorage.getItem(STORAGE_KEY);
+            // if (saved) {
+            //     const parsed = JSON.parse(saved);
+            //     Object.assign(AppData, parsed);
+            // }
             const draft = localStorage.getItem(DRAFT_KEY);
             if (draft) AppData.draft = JSON.parse(draft);
         }
@@ -10184,32 +10238,50 @@
 
             form.addEventListener('submit', e => {
                 e.preventDefault();
-                const word = {
-                    id: generateId(),
-                    word: toTitleCase($('wordInput').value.trim()),
-                    definition: toSentenceCase($('defInput').value.trim()),
-                    bangla: $('banglaInput').value.trim(),
-                    synonyms: synonyms,
-                    example: toSentenceCase($('exampleInput').value.trim()),
-                    category: selectedCategory,
-                    group: selectedGroup,
-                    mastery: 0,
-                    createdAt: Date.now(),
-                    nextReview: Date.now() + 86400000
-                };
+                const wordText = toTitleCase($('wordInput').value.trim());
+                const definition = toSentenceCase($('defInput').value.trim());
+                const bangla = $('banglaInput').value.trim();
+                const example = toSentenceCase($('exampleInput').value.trim());
+
+                if (!wordText || !definition) {
+                    showToast('Please fill in word and definition', 'error');
+                    return;
+                }
 
                 // Check duplicate
-                const dup = AppData.words.find(w => w.word.toLowerCase() === word.word.toLowerCase());
+                const dup = AppData.words.find(w => w.word.toLowerCase() === wordText.toLowerCase());
                 if (dup) {
                     $('duplicateWarning').classList.remove('hidden');
                     $('duplicateDef').textContent = dup.definition;
                     return;
                 }
 
+                const word = {
+                    id: generateId(),
+                    word: wordText,
+                    definition: definition,
+                    bangla: bangla,
+                    synonyms: synonyms,
+                    example: example,
+                    category: selectedCategory,
+                    group: selectedGroup,
+                    mastery: 0,
+                    nextReview: Date.now() + 86400000,
+                    createdAt: Date.now(),
+                    updatedAt: Date.now(),
+                    favorite: false
+                };
+
                 AppData.words.push(word);
                 AppData.stats.todayProgress++;
                 AppData.stats.activities.unshift({ text: `Added "${word.word}"`, time: Date.now(), type: 'add', xp: 10 });
                 saveData();
+
+                // Sync to Supabase
+                SyncService.uploadWord(word).catch(err => {
+                    console.error('Background sync failed:', err);
+                });
+
                 showToast('Word added successfully!', 'success');
                 form.reset();
                 synonyms = [];
@@ -10735,7 +10807,8 @@
                 const matchBangla = w.bangla && w.bangla.toLowerCase().includes(searchLower);
 
                 // Search in synonyms (comma separated)
-                const matchSyn = w.synonyms && w.synonyms.some(s => s.toLowerCase().includes(searchLower));
+                const synonymsArray = Array.isArray(w.synonyms) ? w.synonyms : (w.synonyms || '').toString().split(',').map(s => s.trim()).filter(s => s);
+                const matchSyn = synonymsArray.some(s => s.toLowerCase().includes(searchLower));
 
                 // Search in example/sentence
                 const matchExample = w.example && w.example.toLowerCase().includes(searchLower);
@@ -10991,11 +11064,17 @@
             const word = AppData.words.find(w => w.id === id);
             if (word) {
                 word.favorite = !word.favorite;
+                word.updatedAt = Date.now();
                 saveData();
                 renderWords();
                 const modal = document.querySelector('.word-modal');
                 if (modal) modal.remove();
                 showWordDetail(id);
+
+                // Sync to Supabase
+                SyncService.uploadWord(word).catch(err => {
+                    console.error('Background favorite sync failed:', err);
+                });
             }
         };
 
@@ -11062,13 +11141,20 @@
             document.querySelector('.modal-overlay')?.remove();
         };
 
-        window.confirmDelete = id => {
+        window.confirmDelete = async id => {
             AppData.words = AppData.words.filter(w => w.id !== id);
             saveData();
             closeConfirmModal();
             renderWords();
             updateHome();
             showToast('Word deleted', 'warning');
+
+            // Sync delete to Supabase
+            if (currentUser) {
+                SyncService.deleteWordFromServer(id).catch(err => {
+                    console.error('Background delete sync failed:', err);
+                });
+            }
         };
 
         window.editWord = wordId => {
@@ -11150,8 +11236,15 @@
             word.example = $('editExampleInput').value.trim();
             word.category = $('editCategorySelect').value || 'general';
             word.group = $('editGroupSelect').value;
+            word.updatedAt = Date.now();
 
             saveData();
+
+            // Sync update to Supabase
+            SyncService.uploadWord(word).catch(err => {
+                console.error('Background update sync failed:', err);
+            });
+
             renderWords();
             document.querySelector('.modal-overlay')?.remove();
             showToast('Word updated successfully!');
@@ -11161,10 +11254,16 @@
             const word = AppData.words.find(w => w.id === wordId);
             if (!word) return;
             word.mastery = Math.min((word.mastery || 0) + 10, 100);
+            word.updatedAt = Date.now();
             saveData();
             renderWords();
             updateHome();
             showToast('+10xp Mastery added', 'success');
+
+            // Sync to Supabase
+            SyncService.uploadWord(word).catch(err => {
+                console.error('Quick review sync failed:', err);
+            });
         };
 
         // Quiz System
@@ -11677,6 +11776,14 @@
                 const w = AppData.words[wordIdx];
                 w.mastery = Math.min(100, (w.mastery || 0) + (correct ? 10 : -5));
                 w.nextReview = Date.now() + (correct ? 86400000 * 2 : 3600000);
+                w.updatedAt = Date.now();
+
+                // Sync word update to Supabase (async, don't block quiz)
+                if (currentUser) {
+                    SyncService.uploadWord(w).catch(err => {
+                        console.error('Quiz word sync failed:', err);
+                    });
+                }
             }
 
             // Show feedback
@@ -11933,8 +12040,21 @@
                 }
             });
 
-            $('deleteAllBtn').addEventListener('click', () => {
+            $('deleteAllBtn').addEventListener('click', async () => {
                 if (confirm('DELETE ALL WORDS? This is irreversible!')) {
+                    // Delete all words from server first (if logged in)
+                    if (currentUser) {
+                        try {
+                            await supabaseClient
+                                .from('words')
+                                .delete()
+                                .eq('user_id', currentUser.id);
+                            console.log('✅ All words deleted on server');
+                        } catch (err) {
+                            console.error('Bulk delete failed:', err);
+                            showToast('Server delete failed - will clear locally', 'warning');
+                        }
+                    }
                     AppData.words = [];
                     saveData();
                     updateStats();
@@ -11959,10 +12079,10 @@
             URL.revokeObjectURL(url);
         }
 
-        function handleImport(file) {
+        async function handleImport(file) {
             if (!file) return;
             const reader = new FileReader();
-            reader.onload = e => {
+            reader.onload = async e => {
                 try {
                     let importCount = 0;
                     let skipCount = 0;
@@ -11981,7 +12101,8 @@
                                     ...word,
                                     id: generateId(),
                                     mastery: word.mastery || 0,
-                                    createdAt: Date.now(),
+                                    createdAt: word.createdAt || Date.now(),
+                                    updatedAt: word.updatedAt || Date.now(),
                                     nextReview: Date.now() + 86400000
                                 });
                                 importCount++;
@@ -12038,12 +12159,13 @@
                                 word: wordText,
                                 definition: values[1] || '',
                                 bangla: values[2] || '',
-                                synonyms: values[3]?.split(';'),
+                                synonyms: values[3]?.split(';').map(s => s.trim()) || [],
                                 example: values[4] || '',
                                 category: categoryId,
                                 group: values[6] ? values[6].toString().toLowerCase().replace(/\s+/g, '_') : '',
                                 mastery: parseInt(values[7]) || 0,
                                 createdAt: Date.now(),
+                                updatedAt: Date.now(),
                                 nextReview: Date.now() + 86400000
                             });
                             importCount++;
@@ -12096,29 +12218,44 @@
                                 }
                             }
 
-                            // Map columns: word, definition, bangla, synonyms, example, category, word_group, mastery
-                            AppData.words.push({
-                                id: generateId(),
-                                word: wordText,
-                                definition: row[1] || '',
-                                bangla: row[2] || '',
-                                synonyms: row[3] ? row[3].toString().split(';').map(s => s.trim()) : [],
-                                example: row[4] || '',
-                                category: categoryId,
-                                group: groupName ? groupName.toLowerCase().replace(/\s+/g, '_') : '',
-                                mastery: parseInt(row[7]) || 0,
-                                createdAt: Date.now(),
-                                nextReview: Date.now() + 86400000
-                            });
+                             // Map columns: word, definition, bangla, synonyms, example, category, word_group, mastery
+                             AppData.words.push({
+                                 id: generateId(),
+                                 word: wordText,
+                                 definition: row[1] || '',
+                                 bangla: row[2] || '',
+                                 synonyms: row[3] ? row[3].toString().split(';').map(s => s.trim()) : [],
+                                 example: row[4] || '',
+                                 category: categoryId,
+                                 group: groupName ? groupName.toLowerCase().replace(/\s+/g, '_') : '',
+                                 mastery: parseInt(row[7]) || 0,
+                                 createdAt: Date.now(),
+                                 updatedAt: Date.now(),
+                                 nextReview: Date.now() + 86400000
+                             });
                             importCount++;
                         }
                     }
                     saveData();
-                    const msg = `Imported ${importCount} words successfully!`;
-                    if (skipCount > 0) {
-                        showToast(`${msg} ${skipCount} duplicates skipped.`, 'success');
+                    
+                    // Upload imported words to Supabase
+                    if (currentUser) {
+                        showToast(`Uploading ${importCount} words to server...`, 'warning');
+                        for (let i = AppData.words.length - importCount; i < AppData.words.length; i++) {
+                            const word = AppData.words[i];
+                            const success = await SyncService.uploadWord(word);
+                            if (!success) {
+                                showToast('Some words failed to upload', 'warning');
+                                break;
+                            }
+                        }
+                        showToast(`Imported ${importCount} words successfully!`, 'success');
                     } else {
-                        showToast(msg, 'success');
+                        showToast(`Imported ${importCount} words successfully!`, 'success');
+                    }
+                    
+                    if (skipCount > 0) {
+                        showToast(`${skipCount} duplicates skipped.`, 'warning');
                     }
                     updateStats();
                 } catch (err) {
@@ -12554,11 +12691,20 @@
             $('wodAddBtn').addEventListener('click', () => switchTab('add'));
         }
 
-        // Initialize Supabase
+        // ============================================
+        // SUPABASE AUTHENTICATION & SYNC SERVICE
+        // ============================================
+
+        // Supabase Configuration
         const SUPABASE_URL = 'https://qytvihtvxfkahwlzwpwp.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_cqPpE3S5aIpT232ciewnSg_s65xcUM9';
 
         let supabaseClient;
+        let currentUser = null;
+        let realtimeSubscription = null;
+        let isOnline = true;
+
+        // Initialize Supabase
         try {
             supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
                 auth: {
@@ -12568,77 +12714,100 @@
                 }
             });
             console.log('✅ Supabase client initialized');
+
+            // Check existing session
+            supabaseClient.auth.getSession().then(({ data: { session } }) => {
+                if (session) {
+                    currentUser = session.user;
+                    console.log('✅ Already logged in as:', currentUser.email);
+                    // Will initialize after DOM loads
+                } else {
+                    // Show login after DOM loads
+                    if (document.readyState === 'loading') {
+                        document.addEventListener('DOMContentLoaded', showLoginScreen);
+                    } else {
+                        showLoginScreen();
+                    }
+                }
+            }).catch(err => {
+                console.error('Session check failed:', err);
+                // Show login after DOM loads
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', showLoginScreen);
+                } else {
+                    showLoginScreen();
+                }
+            });
+
+            // Listen for auth changes
+            supabaseClient.auth.onAuthStateChange((event, session) => {
+                console.log('Auth state change:', event);
+                if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+                    currentUser = session?.user || null;
+                    if (currentUser) {
+                        initializeAppWithSync();
+                    }
+                } else if (event === 'SIGNED_OUT') {
+                    currentUser = null;
+                    SyncService.cleanup();
+                    showLoginScreen();
+                }
+            });
+
         } catch (err) {
-            console.log('ℹ️ Supabase not available, using local mode:', err);
-        }
-
-        // Session Management
-        const SESSION_KEY = 'vocavera_session';
-        const SESSION_DURATION_MS = 7 * 24 * 60 * 60 * 1000; // 1 week
-
-        function getSession() {
-            try {
-                const session = localStorage.getItem(SESSION_KEY);
-                return session ? JSON.parse(session) : null;
-            } catch (e) {
-                return null;
+            console.error('❌ Supabase init failed:', err);
+            // Show login after DOM loads
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', showLoginScreen);
+            } else {
+                showLoginScreen();
             }
         }
 
-        function setSession() {
-            const expiresAt = Date.now() + SESSION_DURATION_MS;
-            const session = { authenticated: true, expiresAt };
-            localStorage.setItem(SESSION_KEY, JSON.stringify(session));
-            return session;
+        // Authentication Functions
+        async function signUp(email, password) {
+            const { data, error } = await supabaseClient.auth.signUp({
+                email,
+                password
+            });
+            if (error) throw error;
+            return data;
         }
 
-        function clearSession() {
-            localStorage.removeItem(SESSION_KEY);
+        async function signIn(email, password) {
+            const { data, error } = await supabaseClient.auth.signInWithPassword({
+                email,
+                password
+            });
+            if (error) throw error;
+            return data;
         }
 
-        function isAuthenticated() {
-            const session = getSession();
-            return session && session.authenticated && session.expiresAt > Date.now();
+        async function signOut() {
+            const { error } = await supabaseClient.auth.signOut();
+            if (error) console.error('Logout error:', error);
+            localStorage.removeItem(STORAGE_KEY);
+            localStorage.removeItem(DRAFT_KEY);
         }
 
-        // PIN Authentication
-        const CORRECT_PIN = '179084';
-
-        function attemptLogin(pin) {
-            if (pin === CORRECT_PIN) {
-                setSession();
-                showApp();
-                return true;
-            }
-            return false;
-        }
-
+        // Show login screen
         function showLoginScreen() {
             const loginScreen = $('login-screen');
             const app = $('app');
             const loadingScreen = $('loading-screen');
-
-            // Hide app and loading
             app.classList.add('hidden');
             loadingScreen.classList.add('hidden');
-
-            // Show login
             loginScreen.classList.remove('hidden');
-            $('pinInput').value = '';
-            $('loginError').classList.remove('visible');
-            $('pinInput').focus();
+            resetAuthForms();
         }
 
+        // Show app (called after successful auth)
         function showApp() {
             const loginScreen = $('login-screen');
             const app = $('app');
             const loadingScreen = $('loading-screen');
-
-            // Show loading first (if app needs to initialize)
             loadingScreen.classList.remove('hidden');
             loginScreen.classList.add('hidden');
-
-            // Initialize app after brief delay
             setTimeout(() => {
                 loadingScreen.classList.add('hidden');
                 app.classList.remove('hidden');
@@ -12646,74 +12815,353 @@
             }, 500);
         }
 
-        function handleLogout() {
-            clearSession();
-            showLoginScreen();
+        // Auth form handlers
+        function initAuthForms() {
+            const loginTab = $('loginTab');
+            const signupTab = $('signupTab');
+            const loginForm = $('loginForm');
+            const signupForm = $('signupForm');
+            const loginError = $('loginError');
+
+            loginTab.addEventListener('click', () => {
+                loginTab.classList.add('active');
+                loginTab.style.color = '#374151';
+                signupTab.classList.remove('active');
+                signupTab.style.color = '#6B7280';
+                signupTab.style.background = 'transparent';
+                loginTab.style.background = 'white';
+                loginForm.style.display = 'block';
+                signupForm.style.display = 'none';
+                loginError.style.display = 'none';
+            });
+
+            signupTab.addEventListener('click', () => {
+                signupTab.classList.add('active');
+                signupTab.style.color = '#374151';
+                loginTab.classList.remove('active');
+                loginTab.style.color = '#6B7280';
+                loginTab.style.background = 'transparent';
+                signupTab.style.background = 'white';
+                signupForm.style.display = 'block';
+                loginForm.style.display = 'none';
+                loginError.style.display = 'none';
+            });
+
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = $('loginEmail').value;
+                const password = $('loginPassword').value;
+                const btn = $('loginSubmitBtn');
+                setAuthLoading(btn, true);
+                try {
+                    await signIn(email, password);
+                    loginError.style.display = 'none';
+                } catch (err) {
+                    console.error('Login error:', err);
+                    loginError.textContent = err.message || 'Login failed. Please try again.';
+                    loginError.style.display = 'block';
+                    setAuthLoading(btn, false);
+                }
+            });
+
+            signupForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = $('signupEmail').value;
+                const password = $('signupPassword').value;
+                const confirm = $('signupConfirmPassword').value;
+                const btn = $('signupSubmitBtn');
+
+                if (password !== confirm) {
+                    loginError.textContent = 'Passwords do not match';
+                    loginError.style.display = 'block';
+                    return;
+                }
+
+                setAuthLoading(btn, true);
+                try {
+                    const data = await signUp(email, password);
+                    loginError.textContent = 'Account created! You can now sign in.';
+                    loginError.style.color = '#059669';
+                    loginError.style.display = 'block';
+                    setTimeout(() => {
+                        loginTab.click();
+                    }, 2000);
+                } catch (err) {
+                    console.error('Signup error:', err);
+                    loginError.textContent = err.message || 'Signup failed. Please try again.';
+                    loginError.style.color = '#DC2626';
+                    loginError.style.display = 'block';
+                    setAuthLoading(btn, false);
+                }
+            });
         }
+
+        function setAuthLoading(btn, loading) {
+            btn.disabled = loading;
+            btn.textContent = loading ? 'Please wait...' : (btn.id === 'loginSubmitBtn' ? 'Sign In' : 'Create Account');
+        }
+
+        function resetAuthForms() {
+            $('loginForm').reset();
+            $('signupForm').reset();
+            $('loginError').style.display = 'none';
+            $('loginTab').click();
+        }
+
+        // Logout handler
+        function handleLogout() {
+            signOut();
+        }
+
+        // ============================================
+        // SYNC SERVICE
+        // ============================================
+
+        const SyncService = {
+            initialized: false,
+            syncInProgress: false,
+
+            async initialize(user) {
+                if (this.initialized) return;
+                console.log('🔄 Initializing sync for user:', user.id);
+
+                try {
+                    // Load remote data from Supabase
+                    await this.downloadFromSupabase();
+                    this.setupRealtimeSubscription();
+                    this.initialized = true;
+                    console.log('✅ Sync service ready');
+                } catch (err) {
+                    console.error('❌ Sync initialization failed:', err);
+                }
+            },
+
+            async downloadFromSupabase() {
+                if (!currentUser) return;
+
+                console.log('📥 Downloading words from Supabase...');
+                const { data, error } = await supabaseClient
+                    .from('words')
+                    .select('*')
+                    .order('id', { ascending: false });
+
+                if (error) {
+                    console.error('Download error:', error);
+                    return;
+                }
+
+                if (data && data.length > 0) {
+                    const remoteWords = data.map(w => this.mapSupabaseWordToLocal(w));
+                    console.log(`📥 Loaded ${remoteWords.length} words from server`);
+
+                    // Server-only mode: replace local words with server data
+                    AppData.words = remoteWords;
+                    updateHome(); // Update word count display
+                    console.log(`✅ Loaded ${AppData.words.length} words from server`);
+                } else {
+                    console.log('ℹ️ No words on server');
+                    AppData.words = [];
+                    updateHome();
+                }
+            },
+
+            async uploadWord(word) {
+                if (!currentUser) return;
+
+                const wordForSupabase = {
+                    id: word.id,
+                    user_id: currentUser.id,
+                    word: word.word,
+                    definition: word.definition || null,
+                    bangla: word.bangla || null,
+                    synonyms: JSON.stringify(word.synonyms || []),
+                    example: word.example || null,
+                    category: word.category || 'general',
+                    "group": word.group || null,
+                    mastery: word.mastery || 0,
+                    next_review_date: word.nextReview ? new Date(word.nextReview).toISOString() : null,
+                    created_at: word.createdAt ? new Date(word.createdAt).toISOString() : new Date().toISOString(),
+                    updated_at: word.updatedAt ? new Date(word.updatedAt).toISOString() : new Date().toISOString()
+                };
+
+                console.log('📤 Uploading word:', word.word, wordForSupabase);
+                
+                const { error } = await supabaseClient
+                    .from('words')
+                    .upsert(wordForSupabase);
+
+                if (error) {
+                    console.error('Upload error:', error);
+                    showToast('Failed to save word to server', 'warning');
+                    return false;
+                }
+
+                console.log('✅ Word synced to server');
+                return true;
+            },
+
+            async deleteWordFromServer(wordId) {
+                if (!currentUser) return;
+
+                console.log('🗑️ Deleting word from server:', wordId);
+                const { error } = await supabaseClient
+                    .from('words')
+                    .delete()
+                    .eq('id', wordId)
+                    .eq('user_id', currentUser.id);
+
+                if (error) {
+                    console.error('Delete error:', error);
+                    showToast('Failed to delete word from server', 'warning');
+                    return false;
+                }
+
+                console.log('✅ Word deleted from server');
+                return true;
+            },
+
+            setupRealtimeSubscription() {
+                if (!currentUser) return;
+
+                console.log('👂 Setting up realtime subscription...');
+                realtimeSubscription = supabaseClient
+                    .channel('words-changes')
+                    .on(
+                        'postgres_changes',
+                        {
+                            event: '*',
+                            schema: 'public',
+                            table: 'words',
+                            filter: `user_id=eq.${currentUser.id}`
+                        },
+                        (payload) => {
+                            console.log('📡 Realtime event:', payload.eventType, payload);
+                            this.handleRealtimeEvent(payload);
+                        }
+                    )
+                    .subscribe((status) => {
+                        console.log('Realtime subscription status:', status);
+                    });
+            },
+
+            handleRealtimeEvent(payload) {
+                if (!currentUser) return;
+
+                const { eventType, new: newRow, old: oldRow } = payload;
+                const myClientId = this.getClientId();
+
+                // Ignore changes from this client
+                if (newRow && newRow.client_id === myClientId) {
+                    return;
+                }
+                if (oldRow && oldRow.client_id === myClientId) {
+                    return;
+                }
+
+                switch (eventType) {
+                    case 'INSERT':
+                    case 'UPDATE':
+                        if (newRow && newRow.user_id === currentUser.id) {
+                            const remoteWord = this.mapSupabaseWordToLocal(newRow);
+                            const existingIndex = AppData.words.findIndex(w => w.id === remoteWord.id);
+                            if (existingIndex !== -1) {
+                                const local = AppData.words[existingIndex];
+                                // Remote wins if newer
+                                if (remoteWord.updatedAt > (local.updatedAt || 0)) {
+                                    AppData.words[existingIndex] = remoteWord;
+                                }
+                            } else {
+                                AppData.words.push(remoteWord);
+                            }
+                            saveData();
+                            console.log('✅ Applied remote update');
+                            refreshCurrentView();
+                            showToast('Synced from another device', 'info');
+                        }
+                        break;
+
+                    case 'DELETE':
+                        if (oldRow && oldRow.user_id === currentUser.id) {
+                            AppData.words = AppData.words.filter(w => w.id !== oldRow.id);
+                            saveData();
+                            console.log('✅ Applied remote delete');
+                            refreshCurrentView();
+                            showToast('Word deleted on another device', 'info');
+                        }
+                        break;
+                }
+            },
+
+            mapSupabaseWordToLocal(supabaseWord) {
+                // Parse synonyms - could be JSON string or array
+                let synonyms = [];
+                try {
+                    if (typeof supabaseWord.synonyms === 'string') {
+                        synonyms = JSON.parse(supabaseWord.synonyms);
+                    } else if (Array.isArray(supabaseWord.synonyms)) {
+                        synonyms = supabaseWord.synonyms;
+                    }
+                } catch (e) {
+                    synonyms = [];
+                }
+                
+                return {
+                    id: String(supabaseWord.id || supabaseWord.id),
+                    word: supabaseWord.word || '',
+                    definition: supabaseWord.definition || '',
+                    bangla: supabaseWord.bangla || '',
+                    synonyms: synonyms,
+                    example: supabaseWord.example || '',
+                    category: supabaseWord.category || 'general',
+                    group: 'default',
+                    mastery: supabaseWord.mastery || 0,
+                    nextReview: supabaseWord.next_review_date ? new Date(supabaseWord.next_review_date).getTime() : null,
+                    createdAt: supabaseWord.created_at ? new Date(supabaseWord.created_at).getTime() : Date.now(),
+                    updatedAt: supabaseWord.updated_at ? new Date(supabaseWord.updated_at).getTime() : Date.now(),
+                    favorite: false
+                };
+            },
+
+            getClientId() {
+                let clientId = localStorage.getItem('vocavera_client_id');
+                if (!clientId) {
+                    clientId = 'client_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                    localStorage.setItem('vocavera_client_id', clientId);
+                }
+                return clientId;
+            },
+
+            cleanup() {
+                if (realtimeSubscription) {
+                    supabaseClient.removeChannel(realtimeSubscription);
+                    realtimeSubscription = null;
+                }
+                this.initialized = false;
+            }
+        };
+
+        // Helper to refresh current view after remote change
+        function refreshCurrentView() {
+            const activeTab = document.querySelector('.tab-btn.active')?.dataset.tab;
+            if (activeTab === 'home') updateHome();
+            else if (activeTab === 'words') renderWords();
+            else if (activeTab === 'stats') updateStats();
+        }
+
+        // Wrap original saveData to also sync
+        const originalSaveData = saveData;
+        saveData = function() {
+            originalSaveData();
+            // Sync will happen on next idle moment or explicit call
+        };
+
+
 
         // Modified init to check authentication
         function init() {
-            if (!isAuthenticated()) {
-                showLoginScreen();
-                return;
-            }
-
-            // User is authenticated, load the app
-            loadData();
-            initTabs();
-            initAddWord();
-            initWords();
-            initQuiz();
-            initStats();
-            initManageModal();
-            initQuickActions();
-
-            // Show app after loading
-            setTimeout(() => {
-                $('loading-screen').classList.add('hidden');
-                $('app').classList.remove('hidden');
-                updateHome();
-            }, 1500);
-        }
-
-        // Event Listeners for login and logout
-        document.addEventListener('DOMContentLoaded', () => {
-            const pinInput = $('pinInput');
-            const logoutBtn = $('logoutBtn');
-
-            // PIN input handler
-            if (pinInput) {
-                pinInput.addEventListener('input', (e) => {
-                    const value = e.target.value;
-                    // Remove any non-numeric characters
-                    e.target.value = value.replace(/[^0-9]/g, '');
-
-                    // Auto-submit when 6 digits entered
-                    if (e.target.value.length === 6) {
-                        const success = attemptLogin(e.target.value);
-                        if (!success) {
-                            const error = $('loginError');
-                            error.classList.add('visible');
-                            e.target.value = '';
-                            setTimeout(() => {
-                                e.target.focus();
-                            }, 100);
-                        }
-                    }
-                });
-
-                // Allow Enter key to submit
-                pinInput.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' && pinInput.value.length > 0) {
-                        attemptLogin(pinInput.value);
-                    }
-                });
-            }
-
-            // Logout button (on login screen only)
-            if (logoutBtn) {
-                logoutBtn.addEventListener('click', handleLogout);
-            }
+            // Auth handled by onAuthStateChange listener
+            // This function now just sets up event listeners after DOM load
+            initAuthForms();
 
             // Account menu toggle
             const avatarBtn = $('avatarBtn');
@@ -12728,14 +13176,12 @@
                     accountMenu.classList.toggle('open');
                 });
 
-                // Close menu when clicking outside
                 document.addEventListener('click', (e) => {
                     if (accountMenu.classList.contains('open') && !accountMenu.contains(e.target)) {
                         accountMenu.classList.remove('open');
                     }
                 });
 
-                // Close menu on escape key
                 document.addEventListener('keydown', (e) => {
                     if (e.key === 'Escape' && accountMenu.classList.contains('open')) {
                         accountMenu.classList.remove('open');
@@ -12747,23 +13193,53 @@
             if (accountLogoutBtn) {
                 accountLogoutBtn.addEventListener('click', () => {
                     handleLogout();
-                    accountMenu.classList.remove('open');
                 });
+            }
+        }
+
+        // Initialize app with sync service
+        async function initializeAppWithSync() {
+            // Initialize with default values (server-only mode)
+            AppData.words = [];
+            AppData.stats = { 
+                todayProgress: 0, 
+                dailyGoal: 5, 
+                streakDays: 0, 
+                xp: 0, 
+                level: 1, 
+                correctAnswers: 0, 
+                totalAnswers: 0,
+                activities: [] 
+            };
+            AppData.settings = { theme: 'light', notifications: true, dailyReminder: true, reminderTime: '08:00' };
+            AppData.filters = { category: 'all', group: 'all', search: '' };
+            
+            // Show app UI
+            showApp();
+
+            // Initialize sync service (download from Supabase)
+            try {
+                await SyncService.initialize(currentUser);
+            } catch (err) {
+                console.error('Sync init failed:', err);
+                showToast('Failed to load from server', 'warning');
             }
 
-            // Profile and Settings buttons (placeholder)
-            if (profileBtn) {
-                profileBtn.addEventListener('click', () => {
-                    console.log('Profile clicked');
-                    accountMenu.classList.remove('open');
-                });
-            }
-            if (settingsBtn) {
-                settingsBtn.addEventListener('click', () => {
-                    console.log('Settings clicked');
-                    accountMenu.classList.remove('open');
-                });
-            }
+            // Initialize other app modules
+            initTabs();
+            initAddWord();
+            initWords();
+            initQuiz();
+            initStats();
+            initManageModal();
+            initQuickActions();
+
+            setTimeout(() => {
+                updateHome();
+            }, 500);
+        }
+
+
 
             // Register Service Worker
             if ('serviceWorker' in navigator) {
@@ -12780,14 +13256,13 @@
                   .catch((err) => console.log('❌ SW registration failed:', err));
             }
 
-
-
-            // Check authentication and initialize
+            // Initialize event listeners
             init();
-        });
 
-        // Start
-        // document.addEventListener('DOMContentLoaded', init); // Replaced by inline init call below
+            // Start app if already logged in
+            if (currentUser) {
+                initializeAppWithSync();
+            }
     </script>
 
     <!-- Category/Group Modal -->
