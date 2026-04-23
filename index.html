@@ -3,12 +3,13 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+    <meta name="description" content="Master vocabulary with adaptive quizzes and spaced repetition">
+    <meta name="format-detection" content="telephone=no">
+
     <title>VocaVera - Master Words, Own Language</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;family=Kalpurush:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/idb@8/build/umd.js"></script>
     <style>
         :root {
             --primary: #4F46E5;
@@ -311,13 +312,14 @@
             right: 0;
             height: calc(64px + env(safe-area-inset-bottom));
             padding-bottom: env(safe-area-inset-bottom);
-            background: rgba(255, 255, 255, 0.92);
+            background: var(--surface);
             backdrop-filter: blur(20px);
             border-top: 1px solid var(--border-light);
             display: flex;
             justify-content: space-around;
             align-items: center;
-            z-index: 1000
+            z-index: 1000;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.08);
         }
 
         .sub-tab-toggle {
@@ -541,11 +543,23 @@
             background: transparent;
             cursor: pointer;
             color: var(--text-muted);
-            transition: color 200ms ease
+            transition: all 200ms ease;
+            position: relative;
+            overflow: hidden;
         }
 
         .tab-btn.active {
-            color: var(--primary)
+            color: var(--primary);
+            background: rgba(79, 70, 229, 0.08);
+        }
+        
+        .tab-btn:hover:not(.active) {
+            background: rgba(0, 0, 0, 0.02);
+            color: var(--text-secondary);
+        }
+        
+        .tab-btn:active {
+            transform: scale(0.95);
         }
 
         .tab-indicator {
@@ -566,8 +580,17 @@
         }
 
         .tab-icon {
-            width: 22px;
-            height: 22px
+            width: 24px;
+            height: 24px;
+            transition: transform 200ms ease;
+        }
+        
+        .tab-btn.active .tab-icon {
+            transform: scale(1.1);
+        }
+        
+        .tab-btn:hover:not(.active) .tab-icon {
+            transform: scale(1.05);
         }
 
         .tab-label {
