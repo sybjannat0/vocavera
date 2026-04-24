@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no">
     <meta name="description" content="Master vocabulary with adaptive quizzes and spaced repetition">
     <meta name="format-detection" content="telephone=no">
 
@@ -25,6 +26,7 @@
     <link rel="apple-touch-icon" sizes="192x192" href="https://vocavera.vercel.app/icon-192.png?v=3">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/idb@8/build/umd.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         :root {
             --primary: #4F46E5;
@@ -202,6 +204,7 @@
                 opacity: 0;
                 transform: translateY(30px)
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0)
@@ -288,7 +291,7 @@
         .auth-tab-btn.active {
             background: white;
             color: #374151;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         .login-error {
@@ -308,9 +311,21 @@
         }
 
         @keyframes shake {
-            0%, 100% { transform: translateX(0) }
-            20%, 60% { transform: translateX(-8px) }
-            40%, 80% { transform: translateX(8px) }
+
+            0%,
+            100% {
+                transform: translateX(0)
+            }
+
+            20%,
+            60% {
+                transform: translateX(-8px)
+            }
+
+            40%,
+            80% {
+                transform: translateX(8px)
+            }
         }
 
         .login-footer {
@@ -650,6 +665,7 @@
                 opacity: 0;
                 transform: translateY(100%);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -665,20 +681,24 @@
             right: 0;
             height: 3px;
             background: linear-gradient(90deg,
-                #4F46E5 0%,
-                #7C3AED 20%,
-                #EC4899 40%,
-                #F59E0B 60%,
-                #10B981 80%,
-                #4F46E5 100%
-            );
+                    #4F46E5 0%,
+                    #7C3AED 20%,
+                    #EC4899 40%,
+                    #F59E0B 60%,
+                    #10B981 80%,
+                    #4F46E5 100%);
             background-size: 200% auto;
             animation: gradientShift 4s linear infinite;
         }
 
         @keyframes gradientShift {
-            0% { background-position: 0% center; }
-            100% { background-position: -200% center; }
+            0% {
+                background-position: 0% center;
+            }
+
+            100% {
+                background-position: -200% center;
+            }
         }
 
         .tab-bar::before {
@@ -688,12 +708,11 @@
             border-radius: 24px;
             padding: 1px;
             background: linear-gradient(135deg,
-                rgba(255, 107, 107, 0.4) 0%,
-                rgba(78, 205, 196, 0.4) 25%,
-                rgba(255, 217, 61, 0.4) 50%,
-                rgba(126, 87, 194, 0.4) 75%,
-                rgba(79, 70, 229, 0.4) 100%
-            );
+                    rgba(255, 107, 107, 0.4) 0%,
+                    rgba(78, 205, 196, 0.4) 25%,
+                    rgba(255, 217, 61, 0.4) 50%,
+                    rgba(126, 87, 194, 0.4) 75%,
+                    rgba(79, 70, 229, 0.4) 100%);
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
             mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
             -webkit-mask-composite: xor;
@@ -962,7 +981,10 @@
         }
 
         @keyframes rippleAnim {
-            to { transform: scale(2.5); opacity: 0; }
+            to {
+                transform: scale(2.5);
+                opacity: 0;
+            }
         }
 
         /* Hover state */
@@ -1004,11 +1026,31 @@
         }
 
         /* Per-tab active colors — cohesive blue palette */
-        .tab-btn[data-tab="home"].active { color: #2563EB; }     /* Blue */
-        .tab-btn[data-tab="add"].active { color: #059669; }     /* Green */
-        .tab-btn[data-tab="words"].active { color: #D97706; }   /* Amber */
-        .tab-btn[data-tab="quiz"].active { color: #DC2626; }    /* Red */
-        .tab-btn[data-tab="stats"].active { color: #7C3AED; }   /* Purple */
+        .tab-btn[data-tab="home"].active {
+            color: #2563EB;
+        }
+
+        /* Blue */
+        .tab-btn[data-tab="add"].active {
+            color: #059669;
+        }
+
+        /* Green */
+        .tab-btn[data-tab="words"].active {
+            color: #D97706;
+        }
+
+        /* Amber */
+        .tab-btn[data-tab="quiz"].active {
+            color: #DC2626;
+        }
+
+        /* Red */
+        .tab-btn[data-tab="stats"].active {
+            color: #7C3AED;
+        }
+
+        /* Purple */
 
         /* Tab icon — simple stroke style, consistent size */
         .tab-icon {
@@ -3085,51 +3127,51 @@
             box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4)
         }
 
-         .word-modal-btn.favorite {
-             background: linear-gradient(135deg, #F59E0B, #D97706);
-             color: white;
-             border: none
-         }
+        .word-modal-btn.favorite {
+            background: linear-gradient(135deg, #F59E0B, #D97706);
+            color: white;
+            border: none
+        }
 
-         .word-modal-btn.favorite.active {
-             background: linear-gradient(135deg, #EF4444, #DC2626);
-         }
+        .word-modal-btn.favorite.active {
+            background: linear-gradient(135deg, #EF4444, #DC2626);
+        }
 
-         .word-modal-btn.favorite:hover {
-             box-shadow: 0 8px 20px rgba(245, 158, 11, 0.4)
-         }
+        .word-modal-btn.favorite:hover {
+            box-shadow: 0 8px 20px rgba(245, 158, 11, 0.4)
+        }
 
-         .favorite-label {
-             font-size: 13px
-         }
+        .favorite-label {
+            font-size: 13px
+        }
 
-         .word-modal-btn.practice {
-             background: linear-gradient(135deg, #10B981, #059669);
-             color: white;
-             border: none
-         }
+        .word-modal-btn.practice {
+            background: linear-gradient(135deg, #10B981, #059669);
+            color: white;
+            border: none
+        }
 
-         .word-modal-btn.practice.active {
-             background: linear-gradient(135deg, #6366F1, #4F46E5);
-         }
+        .word-modal-btn.practice.active {
+            background: linear-gradient(135deg, #6366F1, #4F46E5);
+        }
 
-         .word-modal-btn.practice:hover {
-             box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4)
-         }
+        .word-modal-btn.practice:hover {
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4)
+        }
 
-         .word-modal-btn.quiz {
-             background: linear-gradient(135deg, #6366F1, #4F46E5);
-             color: white;
-             border: none
-         }
+        .word-modal-btn.quiz {
+            background: linear-gradient(135deg, #6366F1, #4F46E5);
+            color: white;
+            border: none
+        }
 
-         .word-modal-btn.quiz.active {
-             background: linear-gradient(135deg, #8B5CF6, #7C3AED);
-         }
+        .word-modal-btn.quiz.active {
+            background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+        }
 
-         .word-modal-btn.quiz:hover {
-             box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4)
-         }
+        .word-modal-btn.quiz:hover {
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4)
+        }
 
         .word-modal-btn.delete {
             background: linear-gradient(135deg, #EF4444, #DC2626);
@@ -8388,10 +8430,11 @@
         <button id="logoutBtn" class="login-logout-btn">Logout</button>
         <div class="login-card">
             <div class="login-logo">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                    <path d="M2 17l10 5 10-5"/>
-                    <path d="M2 12l10 5 10-5"/>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                    <path d="M2 17l10 5 10-5" />
+                    <path d="M2 12l10 5 10-5" />
                 </svg>
             </div>
             <h1 class="login-title">VocaVera</h1>
@@ -8399,23 +8442,38 @@
 
             <!-- Auth Mode Toggle -->
             <div style="display:flex;gap:8px;margin-bottom:20px;background:#F3F4F6;padding:4px;border-radius:12px;">
-                <button id="loginTab" class="auth-tab-btn active" style="flex:1;padding:10px;border:none;background:white;border-radius:10px;font-weight:600;color:#374151;cursor:pointer;">Login</button>
-                <button id="signupTab" class="auth-tab-btn" style="flex:1;padding:10px;border:none;background:transparent;border-radius:10px;font-weight:600;color:#6B7280;cursor:pointer;">Sign Up</button>
+                <button id="loginTab" class="auth-tab-btn active"
+                    style="flex:1;padding:10px;border:none;background:white;border-radius:10px;font-weight:600;color:#374151;cursor:pointer;">Login</button>
+                <button id="signupTab" class="auth-tab-btn"
+                    style="flex:1;padding:10px;border:none;background:transparent;border-radius:10px;font-weight:600;color:#6B7280;cursor:pointer;">Sign
+                    Up</button>
             </div>
 
             <!-- Login Form -->
             <form id="loginForm">
-                <input type="email" id="loginEmail" class="login-input" placeholder="Email" autocomplete="email" required style="width:100%;padding:14px 16px;border:2px solid #E5E7EB;border-radius:12px;font-size:15px;margin-bottom:12px;box-sizing:border-box;outline:none;transition:border-color 200ms;" />
-                <input type="password" id="loginPassword" class="login-input" placeholder="Password" autocomplete="current-password" required style="width:100%;padding:14px 16px;border:2px solid #E5E7EB;border-radius:12px;font-size:15px;margin-bottom:16px;box-sizing:border-box;outline:none;transition:border-color 200ms;" />
-                <button type="submit" id="loginSubmitBtn" class="btn btn-primary" style="width:100%;min-height:48px;font-size:15px;font-weight:600;">Sign In</button>
+                <input type="email" id="loginEmail" class="login-input" placeholder="Email" autocomplete="email"
+                    required
+                    style="width:100%;padding:14px 16px;border:2px solid #E5E7EB;border-radius:12px;font-size:15px;margin-bottom:12px;box-sizing:border-box;outline:none;transition:border-color 200ms;" />
+                <input type="password" id="loginPassword" class="login-input" placeholder="Password"
+                    autocomplete="current-password" required
+                    style="width:100%;padding:14px 16px;border:2px solid #E5E7EB;border-radius:12px;font-size:15px;margin-bottom:16px;box-sizing:border-box;outline:none;transition:border-color 200ms;" />
+                <button type="submit" id="loginSubmitBtn" class="btn btn-primary"
+                    style="width:100%;min-height:48px;font-size:15px;font-weight:600;">Sign In</button>
             </form>
 
             <!-- Sign Up Form -->
             <form id="signupForm" style="display:none;">
-                <input type="email" id="signupEmail" class="login-input" placeholder="Email" autocomplete="email" required style="width:100%;padding:14px 16px;border:2px solid #E5E7EB;border-radius:12px;font-size:15px;margin-bottom:12px;box-sizing:border-box;outline:none;transition:border-color 200ms;" />
-                <input type="password" id="signupPassword" class="login-input" placeholder="Password (min 6 chars)" autocomplete="new-password" required minlength="6" style="width:100%;padding:14px 16px;border:2px solid #E5E7EB;border-radius:12px;font-size:15px;margin-bottom:12px;box-sizing:border-box;outline:none;transition:border-color 200ms;" />
-                <input type="password" id="signupConfirmPassword" class="login-input" placeholder="Confirm Password" autocomplete="new-password" required style="width:100%;padding:14px 16px;border:2px solid #E5E7EB;border-radius:12px;font-size:15px;margin-bottom:16px;box-sizing:border-box;outline:none;transition:border-color 200ms;" />
-                <button type="submit" id="signupSubmitBtn" class="btn btn-primary" style="width:100%;min-height:48px;font-size:15px;font-weight:600;">Create Account</button>
+                <input type="email" id="signupEmail" class="login-input" placeholder="Email" autocomplete="email"
+                    required
+                    style="width:100%;padding:14px 16px;border:2px solid #E5E7EB;border-radius:12px;font-size:15px;margin-bottom:12px;box-sizing:border-box;outline:none;transition:border-color 200ms;" />
+                <input type="password" id="signupPassword" class="login-input" placeholder="Password (min 6 chars)"
+                    autocomplete="new-password" required minlength="6"
+                    style="width:100%;padding:14px 16px;border:2px solid #E5E7EB;border-radius:12px;font-size:15px;margin-bottom:12px;box-sizing:border-box;outline:none;transition:border-color 200ms;" />
+                <input type="password" id="signupConfirmPassword" class="login-input" placeholder="Confirm Password"
+                    autocomplete="new-password" required
+                    style="width:100%;padding:14px 16px;border:2px solid #E5E7EB;border-radius:12px;font-size:15px;margin-bottom:16px;box-sizing:border-box;outline:none;transition:border-color 200ms;" />
+                <button type="submit" id="signupSubmitBtn" class="btn btn-primary"
+                    style="width:100%;min-height:48px;font-size:15px;font-weight:600;">Create Account</button>
             </form>
 
             <div id="loginError" class="login-error" style="display:none;"></div>
@@ -8446,29 +8504,29 @@
     </div>
 
     <div id="app" class="hidden">
-         <header id="appHeader" class="app-header">
-             <div class="brand">
-                 <div class="brand-mark">
-                     <svg viewBox="0 0 28 28" fill="none">
-                         <defs>
-                             <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                 <stop offset="0%" stop-color="#4F46E5" />
-                                 <stop offset="100%" stop-color="#9333EA" />
-                             </linearGradient>
-                         </defs>
-                         <path d="M14 2L24 12L20 22L14 28L8 22L4 12L14 2Z" fill="url(#brandGrad)" />
-                     </svg>
-                 </div>
-                 <span class="brand-name">VocaVera</span>
-             </div>
-             <div class="header-actions">
-                 <button class="avatar-btn" id="avatarBtn">
-                     <span class="avatar-letter">V</span>
-                     <span class="xp-badge" id="levelBadge">1</span>
-                 </button>
-             </div>
-             <!-- Account Dropdown Menu -->
-             <div class="account-menu" id="accountMenu">
+        <header id="appHeader" class="app-header">
+            <div class="brand">
+                <div class="brand-mark">
+                    <svg viewBox="0 0 28 28" fill="none">
+                        <defs>
+                            <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#4F46E5" />
+                                <stop offset="100%" stop-color="#9333EA" />
+                            </linearGradient>
+                        </defs>
+                        <path d="M14 2L24 12L20 22L14 28L8 22L4 12L14 2Z" fill="url(#brandGrad)" />
+                    </svg>
+                </div>
+                <span class="brand-name">VocaVera</span>
+            </div>
+            <div class="header-actions">
+                <button class="avatar-btn" id="avatarBtn">
+                    <span class="avatar-letter">V</span>
+                    <span class="xp-badge" id="levelBadge">1</span>
+                </button>
+            </div>
+            <!-- Account Dropdown Menu -->
+            <div class="account-menu" id="accountMenu">
                 <div class="account-menu-header">
                     <div class="account-menu-avatar">V</div>
                     <div class="account-menu-info">
@@ -8479,23 +8537,23 @@
                 <div class="account-menu-list">
                     <button class="account-menu-item" id="profileBtn">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                            <circle cx="12" cy="7" r="4"/>
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                            <circle cx="12" cy="7" r="4" />
                         </svg>
                         Profile
                     </button>
                     <button class="account-menu-item" id="settingsBtn">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="3"/>
-                            <path d="M12 1v6m0 6v6m6-12.3l-5.2 3M12 1l5.2 3m-6.5-3L1 12.3M23 12l-5.2 3m6.5-3l-5.2-3"/>
+                            <circle cx="12" cy="12" r="3" />
+                            <path d="M12 1v6m0 6v6m6-12.3l-5.2 3M12 1l5.2 3m-6.5-3L1 12.3M23 12l-5.2 3m6.5-3l-5.2-3" />
                         </svg>
                         Settings
                     </button>
                     <button class="account-menu-item logout" id="accountLogoutBtn">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                            <polyline points="16 17 21 12 16 7"/>
-                            <line x1="21" y1="12" x2="9" y2="12"/>
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                            <polyline points="16 17 21 12 16 7" />
+                            <line x1="21" y1="12" x2="9" y2="12" />
                         </svg>
                         Logout
                     </button>
@@ -10157,7 +10215,7 @@
                 return crypto.randomUUID();
             }
             // Fallback: generate a proper UUID v4 format
-            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
                 const r = Math.random() * 16 | 0;
                 const v = c === 'x' ? r : (r & 0x3 | 0x8);
                 return v.toString(16);
@@ -10468,16 +10526,16 @@
                     quiz: false
                 };
 
-                 AppData.words.push(word);
-                 AppData.stats.todayProgress++;
-                 AppData.stats.activities.unshift({ text: `Added "${word.word}"`, time: Date.now(), type: 'add', xp: 10 });
-                 saveData();
+                AppData.words.push(word);
+                AppData.stats.todayProgress++;
+                AppData.stats.activities.unshift({ text: `Added "${word.word}"`, time: Date.now(), type: 'add', xp: 10 });
+                saveData();
 
-                 // Sync word and stats to Supabase
-                 SyncService.uploadWord(word).catch(err => {
-                     console.error('Background word sync failed:', err);
-                 });
-                 SyncService.uploadStats().catch(() => {});
+                // Sync word and stats to Supabase
+                SyncService.uploadWord(word).catch(err => {
+                    console.error('Background word sync failed:', err);
+                });
+                SyncService.uploadStats().catch(() => { });
 
                 showToast('Word added successfully!', 'success');
                 form.reset();
@@ -10659,48 +10717,585 @@
 
         // Export functions
         function exportToPDF() {
-            // Simple text export - in a real app would use a library like jsPDF
-            let content = 'Vocabulary Export\n' + '='.repeat(30) + '\n\n';
-            AppData.words.forEach(w => {
-                content += `Word: ${w.word}\n`;
-                content += `Definition: ${w.definition || '-'}\n`;
-                content += `Bangla: ${w.bangla || '-'}\n`;
-                content += `Synonyms: ${w.synonyms ? w.synonyms.join(', ') : '-'}\n`;
-                content += `Example: ${w.example || '-'}\n`;
-                content += '-'.repeat(30) + '\n\n';
+            // Apply the same filtering and sorting as renderWords
+            let filtered = AppData.words.filter(w => {
+                const searchLower = searchQuery.toLowerCase();
+
+                // Search in word
+                const matchWord = w.word.toLowerCase().includes(searchLower);
+
+                // Search in definition
+                const matchDef = w.definition && w.definition.toLowerCase().includes(searchLower);
+
+                // Search in bangla meaning
+                const matchBangla = w.bangla && w.bangla.toLowerCase().includes(searchLower);
+
+                // Search in synonyms (comma separated)
+                const synonymsArray = Array.isArray(w.synonyms) ? w.synonyms : (w.synonyms || '').toString().split(',').map(s => s.trim()).filter(s => s);
+                const matchSyn = synonymsArray.some(s => s.toLowerCase().includes(searchLower));
+
+                // Search in example/sentence
+                const matchExample = w.example && w.example.toLowerCase().includes(searchLower);
+
+                return matchWord || matchDef || matchBangla || matchSyn || matchExample;
             });
 
-            // Create blob and download
-            const blob = new Blob([content], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'vocabulary_export.txt';
-            a.click();
-            URL.revokeObjectURL(url);
+            // Apply category or group filter (only if not 'all')
+            if (filterMode === 'category') {
+                if (filterCategory !== 'all') {
+                    if (filterCategory === 'uncategorized') {
+                        filtered = filtered.filter(w => !w.category);
+                    } else {
+                        filtered = filtered.filter(w => w.category === filterCategory);
+                    }
+                }
+            } else {
+                if (filterGroup !== 'all') {
+                    filtered = filtered.filter(w => w.group === filterGroup);
+                }
+            }
+
+            // Apply favorites filter
+            if (showFavoritesOnly) {
+                filtered = filtered.filter(w => w.favorite);
+            }
+
+            // Apply sorting
+            filtered.sort((a, b) => {
+                switch (sortBy) {
+                    case 'date-desc':
+                        return b.createdAt - a.createdAt;
+                    case 'date-asc':
+                        return a.createdAt - b.createdAt;
+                    case 'alpha-asc':
+                        return a.word.localeCompare(b.word);
+                    case 'alpha-desc':
+                        return b.word.localeCompare(b.word);
+                    case 'group-asc':
+                        const groupA = a.group || '';
+                        const groupB = b.group || '';
+                        return groupA.localeCompare(groupB);
+                    case 'group-desc':
+                        const groupA2 = a.group || '';
+                        const groupB2 = b.group || '';
+                        return groupB2.localeCompare(groupA2);
+                    case 'mastery-desc':
+                        return (b.mastery || 0) - (a.mastery || 0);
+                    case 'mastery-asc':
+                        return (a.mastery || 0) - (b.mastery || 0);
+                    default:
+                        return 0;
+                }
+            });
+
+            // Create modern colorful PDF
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('l', 'mm', 'a4');
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const margin = 15;
+            const contentWidth = pageWidth - 2 * margin;
+
+            // Helper function to draw rounded rectangle
+            function drawRoundedRect(x, y, w, h, r, fillColor, strokeColor, lineWidth) {
+                doc.setDrawColor(strokeColor[0], strokeColor[1], strokeColor[2]);
+                doc.setFillColor(fillColor[0], fillColor[1], fillColor[2]);
+                doc.setLineWidth(lineWidth);
+                doc.roundedRect(x, y, w, h, r, r, 'FD');
+            }
+
+            // Color palette (RGB format for jsPDF)
+            const colors = {
+                primary: [79, 70, 229],
+                primaryLight: [238, 242, 255],
+                primaryDark: [55, 48, 163],
+                success: [16, 185, 129],
+                successLight: [209, 250, 229],
+                warning: [245, 158, 11],
+                warningLight: [254, 243, 199],
+                danger: [239, 68, 68],
+                dangerLight: [254, 226, 226],
+                info: [59, 130, 246],
+                infoLight: [219, 234, 254],
+                bangla: [5, 150, 105],
+                banglaLight: [209, 250, 229],
+                purple: [139, 92, 246],
+                purpleLight: [237, 233, 254],
+                gray: [107, 114, 128],
+                grayLight: [243, 244, 246],
+                borderGray: [229, 231, 235],
+                textDark: [31, 41, 55],
+                textLight: [107, 114, 128],
+                white: [255, 255, 255]
+            };
+
+            // Calculate stats
+            const totalWords = filtered.length;
+            const avgMastery = totalWords ? Math.round(filtered.reduce((a, w) => a + (w.mastery || 0), 0) / totalWords) : 0;
+            const masteredWords = filtered.filter(w => (w.mastery || 0) >= 80).length;
+            const learningWords = filtered.filter(w => (w.mastery || 0) > 0 && (w.mastery || 0) < 80).length;
+            const newWords = filtered.filter(w => !(w.mastery || 0)).length;
+            const categories = [...new Set(filtered.map(w => w.category).filter(Boolean))].length;
+            const groups = [...new Set(filtered.map(w => w.group).filter(Boolean))].length;
+
+            // ========== PAGE 1: DASHBOARD ==========
+            let currentY = margin;
+
+            // Header with gradient background
+            const headerHeight = 55;
+            drawRoundedRect(margin, currentY, contentWidth, headerHeight, 15, colors.primary, colors.primaryDark, 0);
+            doc.setDrawColor(colors.primaryDark[0], colors.primaryDark[1], colors.primaryDark[2]);
+            doc.setLineWidth(2);
+            doc.roundedRect(margin, currentY, contentWidth, headerHeight, 15, 15, 'S');
+
+            // Title
+            doc.setFontSize(26);
+            doc.setTextColor(colors.white[0], colors.white[1], colors.white[2]);
+            doc.setFont('helvetica', 'bold');
+            doc.text('VocaVera', margin + 20, currentY + 22);
+            doc.setFontSize(14);
+            doc.setFont('helvetica', 'normal');
+            doc.text('Vocabulary Export Dashboard', margin + 20, currentY + 40);
+
+            // Export date on right
+            doc.setFontSize(10);
+            doc.setTextColor(200, 200, 255);
+            const exportDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            doc.text('Exported: ' + exportDate, pageWidth - margin - 10, currentY + 35, 'right');
+
+            currentY += headerHeight + 20;
+
+            // Section: Statistics Overview
+            doc.setFontSize(16);
+            doc.setTextColor(colors.textDark[0], colors.textDark[1], colors.textDark[2]);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Statistics Overview', margin, currentY + 10);
+            currentY += 25;
+
+            // Stats cards
+            const statCards = [
+                { label: 'Total Words', value: totalWords, color: colors.primary, bgColor: colors.primaryLight, icon: 'W', subtext: 'words in list' },
+                { label: 'Mastered', value: masteredWords, color: colors.success, bgColor: colors.successLight, icon: 'M', subtext: avgMastery + '% avg' },
+                { label: 'Learning', value: learningWords, color: colors.warning, bgColor: colors.warningLight, icon: 'L', subtext: 'in progress' },
+                { label: 'New Words', value: newWords, color: colors.danger, bgColor: colors.dangerLight, icon: 'N', subtext: 'to learn' }
+            ];
+
+            const cardWidth = (contentWidth - 45) / 4;
+            const cardHeight = 85;
+
+            statCards.forEach((card, i) => {
+                const x = margin + i * (cardWidth + 15);
+
+                // Card shadow effect (using gray)
+                drawRoundedRect(x + 2, currentY + 2, cardWidth, cardHeight, 12, [220, 220, 220], [200, 200, 200], 0);
+                // Card background
+                drawRoundedRect(x, currentY, cardWidth, cardHeight, 12, card.bgColor, card.color, 2);
+
+                // Icon (using letter instead of emoji for compatibility)
+                doc.setFontSize(28);
+                doc.text(card.icon, x + cardWidth / 2, currentY + 28, 'center');
+
+                // Value
+                doc.setFontSize(26);
+                doc.setTextColor(card.color[0], card.color[1], card.color[2]);
+                doc.setFont('helvetica', 'bold');
+                doc.text(card.value.toString(), x + cardWidth / 2, currentY + 52, 'center');
+
+                // Label
+                doc.setFontSize(10);
+                doc.setTextColor(colors.textDark[0], colors.textDark[1], colors.textDark[2]);
+                doc.setFont('helvetica', 'normal');
+                doc.text(card.label, x + cardWidth / 2, currentY + 66, 'center');
+
+                // Subtext
+                doc.setFontSize(8);
+                doc.setTextColor(colors.textLight[0], colors.textLight[1], colors.textLight[2]);
+                doc.text(card.subtext, x + cardWidth / 2, currentY + 76, 'center');
+            });
+
+            currentY += cardHeight + 25;
+
+            // Section: Mastery Distribution
+            doc.setFontSize(16);
+            doc.setTextColor(colors.textDark[0], colors.textDark[1], colors.textDark[2]);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Mastery Distribution', margin, currentY + 10);
+            currentY += 20;
+
+            // Bar chart
+            const barWidth = contentWidth - 120;
+            const barHeight = 28;
+            const barX = margin + 100;
+            const barSpacing = 40;
+
+            // Mastered bar
+            const masteredPct = totalWords ? (masteredWords / totalWords) : 0;
+            drawRoundedRect(barX, currentY, barWidth, barHeight, 6, colors.grayLight, colors.borderGray, 1);
+            if (masteredPct > 0) {
+                drawRoundedRect(barX, currentY, Math.max(barWidth * masteredPct, 20), barHeight, 6, colors.successLight, colors.success, 1);
+            }
+            doc.setFontSize(11);
+            doc.setTextColor(colors.textDark[0], colors.textDark[1], colors.textDark[2]);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Mastered (>=80%)', margin, currentY + 19);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(colors.success[0], colors.success[1], colors.success[2]);
+            doc.text(Math.round(masteredPct * 100) + '%', barX + barWidth + 10, currentY + 19);
+
+            currentY += barSpacing;
+
+            // Learning bar
+            const learningPct = totalWords ? (learningWords / totalWords) : 0;
+            drawRoundedRect(barX, currentY, barWidth, barHeight, 6, colors.grayLight, colors.borderGray, 1);
+            if (learningPct > 0) {
+                drawRoundedRect(barX, currentY, Math.max(barWidth * learningPct, 20), barHeight, 6, colors.warningLight, colors.warning, 1);
+            }
+            doc.setTextColor(colors.textDark[0], colors.textDark[1], colors.textDark[2]);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Learning (1-79%)', margin, currentY + 19);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(colors.warning[0], colors.warning[1], colors.warning[2]);
+            doc.text(Math.round(learningPct * 100) + '%', barX + barWidth + 10, currentY + 19);
+
+            currentY += barSpacing;
+
+            // New bar
+            const newPct = totalWords ? (newWords / totalWords) : 0;
+            drawRoundedRect(barX, currentY, barWidth, barHeight, 6, colors.grayLight, colors.borderGray, 1);
+            if (newPct > 0) {
+                drawRoundedRect(barX, currentY, Math.max(barWidth * newPct, 20), barHeight, 6, colors.dangerLight, colors.danger, 1);
+            }
+            doc.setTextColor(colors.textDark[0], colors.textDark[1], colors.textDark[2]);
+            doc.setFont('helvetica', 'bold');
+            doc.text('New (0%)', margin, currentY + 19);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(colors.danger[0], colors.danger[1], colors.danger[2]);
+            doc.text(Math.round(newPct * 100) + '%', barX + barWidth + 10, currentY + 19);
+
+            currentY += barSpacing + 15;
+
+            // Additional info cards
+            const infoCards = [
+                { label: 'Categories', value: categories, color: colors.purple, bgColor: colors.purpleLight, icon: 'C' },
+                { label: 'Groups', value: groups, color: colors.info, bgColor: colors.infoLight, icon: 'G' },
+                { label: 'Avg Mastery', value: avgMastery + '%', color: colors.primary, bgColor: colors.primaryLight, icon: 'A' }
+            ];
+
+            const infoCardWidth = (contentWidth - 30) / 3;
+            const infoCardHeight = 50;
+
+            infoCards.forEach((card, i) => {
+                const x = margin + i * (infoCardWidth + 15);
+                drawRoundedRect(x, currentY, infoCardWidth, infoCardHeight, 10, card.bgColor, card.color, 1.5);
+
+                doc.setFontSize(24);
+                doc.text(card.icon, x + 20, currentY + 32);
+                doc.setFontSize(18);
+                doc.setTextColor(card.color[0], card.color[1], card.color[2]);
+                doc.setFont('helvetica', 'bold');
+                doc.text(card.value.toString(), x + infoCardWidth / 2 + 10, currentY + 24, 'center');
+                doc.setFontSize(9);
+                doc.setTextColor(colors.textLight[0], colors.textLight[1], colors.textLight[2]);
+                doc.setFont('helvetica', 'normal');
+                doc.text(card.label, x + infoCardWidth / 2 + 10, currentY + 38, 'center');
+            });
+
+            // ========== TABLE PAGES ==========
+            if (filtered.length > 0) {
+                doc.addPage();
+                currentY = margin;
+
+                // Table title
+                doc.setFontSize(18);
+                doc.setTextColor(colors.textDark[0], colors.textDark[1], colors.textDark[2]);
+                doc.setFont('helvetica', 'bold');
+                doc.text('Vocabulary List', margin, currentY + 10);
+                currentY += 20;
+
+                // Table configuration
+                const tableWidth = contentWidth;
+                const tableStartX = margin;
+                const tableEndX = tableStartX + tableWidth;
+
+                // Column widths (percentages): Word, Definition, Bangla, Synonym, Example
+                const colPcts = [18, 25, 18, 17, 22];
+                const colWidths = colPcts.map(pct => (pct / 100) * tableWidth);
+
+                // Column positions (left edges)
+                const colPositions = [tableStartX];
+                for (let i = 1; i < colWidths.length; i++) {
+                    colPositions.push(colPositions[i - 1] + colWidths[i - 1]);
+                }
+
+                // Header
+                const headerHeight = 32;
+                const baseRowHeight = 55;
+                const cellPadding = 6;
+                const lineWidth = 0.3;
+
+                // Function to draw table grid for a row
+                function drawRowGrid(y, h) {
+                    // Set grid line style
+                    doc.setDrawColor(200, 200, 200);
+                    doc.setLineWidth(lineWidth);
+
+                    // Draw horizontal lines (top and bottom)
+                    doc.line(tableStartX, y, tableEndX, y);
+                    doc.line(tableStartX, y + h, tableEndX, y + h);
+
+                    // Draw vertical lines (column boundaries)
+                    colPositions.forEach(x => {
+                        doc.line(x, y, x, y + h);
+                    });
+                    // Last column right boundary
+                    doc.line(tableEndX, y, tableEndX, y + h);
+                }
+
+                // Draw header background
+                doc.setFillColor(colors.primary[0], colors.primary[1], colors.primary[2]);
+                doc.rect(tableStartX, currentY, tableWidth, headerHeight, 'F');
+
+                // Draw header grid
+                drawRowGrid(currentY, headerHeight);
+
+                // Header text
+                const headers = ['Word', 'Definition', 'Bangla', 'Synonym', 'Example'];
+                doc.setFontSize(10);
+                doc.setTextColor(colors.white[0], colors.white[1], colors.white[2]);
+                doc.setFont('helvetica', 'bold');
+
+                headers.forEach((header, i) => {
+                    doc.text(header, colPositions[i] + cellPadding, currentY + headerHeight / 2 + 3.5);
+                });
+
+                currentY += headerHeight;
+
+                // Draw table rows
+                filtered.forEach((w, index) => {
+                    // Calculate row height based on content
+                    const wordText = w.word || '—';
+                    const defText = w.definition || '—';
+                    const banglaText = w.bangla || '—';
+                    const synonyms = Array.isArray(w.synonyms) ? w.synonyms : (w.synonyms || '').toString().split(',').map(s => s.trim()).filter(s => s);
+                    const synText = synonyms.length > 0 ? synonyms.slice(0, 2).join(', ') + (synonyms.length > 2 ? '...' : '') : '—';
+                    const exampleText = w.example || '—';
+
+                    const maxLines = Math.max(
+                        doc.splitTextToSize(wordText, colWidths[0] - cellPadding * 2).length,
+                        doc.splitTextToSize(defText, colWidths[1] - cellPadding * 2).length,
+                        doc.splitTextToSize(banglaText, colWidths[2] - cellPadding * 2).length,
+                        doc.splitTextToSize(synText, colWidths[3] - cellPadding * 2).length,
+                        doc.splitTextToSize(exampleText, colWidths[4] - cellPadding * 2).length
+                    );
+
+                    const rowHeight = Math.max(baseRowHeight, maxLines * 10 + cellPadding * 2);
+
+                    // Check page break
+                    if (currentY + rowHeight > pageHeight - margin - 15) {
+                        doc.addPage();
+                        currentY = margin;
+
+                        // Redraw header on new page
+                        doc.setFillColor(colors.primary[0], colors.primary[1], colors.primary[2]);
+                        doc.rect(tableStartX, currentY, tableWidth, headerHeight, 'F');
+                        drawRowGrid(currentY, headerHeight);
+
+                        doc.setFontSize(10);
+                        doc.setTextColor(colors.white[0], colors.white[1], colors.white[2]);
+                        doc.setFont('helvetica', 'bold');
+                        headers.forEach((header, i) => {
+                            doc.text(header, colPositions[i] + cellPadding, currentY + headerHeight / 2 + 3.5);
+                        });
+                        currentY += headerHeight;
+                    }
+
+                    // Row background (alternating)
+                    const rowBg = index % 2 === 0 ? [248, 249, 255] : [255, 255, 255];
+                    doc.setFillColor(rowBg[0], rowBg[1], rowBg[2]);
+                    doc.rect(tableStartX, currentY, tableWidth, rowHeight, 'F');
+
+                    // Draw row grid
+                    drawRowGrid(currentY, rowHeight);
+
+                    // Mastery indicator (colored left border)
+                    const mastery = w.mastery || 0;
+                    const masteryColor = mastery >= 80 ? colors.success : mastery >= 50 ? colors.warning : mastery >= 20 ? [245, 158, 11] : colors.danger;
+                    doc.setFillColor(masteryColor[0], masteryColor[1], masteryColor[2]);
+                    doc.rect(tableStartX, currentY, 4, rowHeight, 'F');
+
+                    // Word (bold)
+                    doc.setFontSize(10);
+                    doc.setTextColor(colors.textDark[0], colors.textDark[1], colors.textDark[2]);
+                    doc.setFont('helvetica', 'bold');
+                    const wordLines = doc.splitTextToSize(wordText, colWidths[0] - cellPadding * 2 - 6);
+                    doc.text(wordLines, colPositions[0] + cellPadding + 6, currentY + cellPadding + 4);
+
+                    // Definition
+                    doc.setFont('helvetica', 'normal');
+                    doc.setFontSize(9);
+                    doc.setTextColor(colors.textLight[0], colors.textLight[1], colors.textLight[2]);
+                    const defLines = doc.splitTextToSize(defText, colWidths[1] - cellPadding * 2);
+                    const maxDefLines = Math.floor((rowHeight - cellPadding * 2) / 10);
+                    const displayDefLines = defLines.slice(0, maxDefLines);
+                    if (defLines.length > maxDefLines) {
+                        displayDefLines[maxDefLines - 1] = displayDefLines[maxDefLines - 1].slice(0, -3) + '...';
+                    }
+                    doc.text(displayDefLines, colPositions[1] + cellPadding, currentY + cellPadding + 4);
+
+                    // Bangla
+                    doc.setFontSize(9);
+                    doc.setTextColor(colors.bangla[0], colors.bangla[1], colors.bangla[2]);
+                    doc.setFont('helvetica', 'bold');
+                    const banglaLines = doc.splitTextToSize(banglaText, colWidths[2] - cellPadding * 2);
+                    const maxBanglaLines = Math.floor((rowHeight - cellPadding * 2) / 10);
+                    const displayBanglaLines = banglaLines.slice(0, maxBanglaLines);
+                    if (banglaLines.length > maxBanglaLines) {
+                        displayBanglaLines[maxBanglaLines - 1] = displayBanglaLines[maxBanglaLines - 1].slice(0, -3) + '...';
+                    }
+                    doc.text(displayBanglaLines, colPositions[2] + cellPadding, currentY + cellPadding + 4);
+
+                    // Synonyms
+                    doc.setFont('helvetica', 'normal');
+                    doc.setFontSize(8);
+                    doc.setTextColor(120, 120, 150);
+                    const synLines = doc.splitTextToSize(synText, colWidths[3] - cellPadding * 2);
+                    doc.text(synLines, colPositions[3] + cellPadding, currentY + cellPadding + 4);
+
+                    // Example
+                    doc.setFontSize(8);
+                    doc.setTextColor(colors.textLight[0], colors.textLight[1], colors.textLight[2]);
+                    const exampleLines = doc.splitTextToSize(exampleText, colWidths[4] - cellPadding * 2);
+                    const maxExampleLines = Math.floor((rowHeight - cellPadding * 2) / 9);
+                    const displayExampleLines = exampleLines.slice(0, maxExampleLines);
+                    if (exampleLines.length > maxExampleLines) {
+                        displayExampleLines[maxExampleLines - 1] = displayExampleLines[maxExampleLines - 1].slice(0, -3) + '...';
+                    }
+                    doc.text(displayExampleLines, colPositions[4] + cellPadding, currentY + cellPadding + 4);
+
+                    currentY += rowHeight;
+                });
+
+                // Draw bottom border for the table
+                doc.setDrawColor(200, 200, 200);
+                doc.setLineWidth(lineWidth);
+                doc.line(tableStartX, currentY, tableEndX, currentY);
+            }
+
+            // Footer on all pages
+            const totalPages = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= totalPages; i++) {
+                doc.setPage(i);
+                doc.setFontSize(8);
+                doc.setTextColor(colors.textLight[0], colors.textLight[1], colors.textLight[2]);
+                doc.text('Generated by VocaVera - Your Personal Vocabulary Manager', margin, pageHeight - 8);
+                doc.text('Page ' + i + ' of ' + totalPages, pageWidth - margin, pageHeight - 8, 'right');
+                doc.text('Export Date: ' + new Date().toLocaleDateString(), pageWidth / 2, pageHeight - 8, 'center');
+            }
+
+            // Save the PDF
+            doc.save('vocabulary_export_' + new Date().toISOString().split('T')[0] + '.pdf');
         }
 
         function exportToExcel() {
-            // CSV format for Excel
-            let content = 'Word,Definition,Bangla,Synonyms,Example,Category,Group\n';
-            AppData.words.forEach(w => {
-                const row = [
+            // Apply the same filtering and sorting as renderWords
+            let filtered = AppData.words.filter(w => {
+                const searchLower = searchQuery.toLowerCase();
+
+                // Search in word
+                const matchWord = w.word.toLowerCase().includes(searchLower);
+
+                // Search in definition
+                const matchDef = w.definition && w.definition.toLowerCase().includes(searchLower);
+
+                // Search in bangla meaning
+                const matchBangla = w.bangla && w.bangla.toLowerCase().includes(searchLower);
+
+                // Search in synonyms (comma separated)
+                const synonymsArray = Array.isArray(w.synonyms) ? w.synonyms : (w.synonyms || '').toString().split(',').map(s => s.trim()).filter(s => s);
+                const matchSyn = synonymsArray.some(s => s.toLowerCase().includes(searchLower));
+
+                // Search in example/sentence
+                const matchExample = w.example && w.example.toLowerCase().includes(searchLower);
+
+                return matchWord || matchDef || matchBangla || matchSyn || matchExample;
+            });
+
+            // Apply category or group filter (only if not 'all')
+            if (filterMode === 'category') {
+                if (filterCategory !== 'all') {
+                    if (filterCategory === 'uncategorized') {
+                        filtered = filtered.filter(w => !w.category);
+                    } else {
+                        filtered = filtered.filter(w => w.category === filterCategory);
+                    }
+                }
+            } else {
+                if (filterGroup !== 'all') {
+                    filtered = filtered.filter(w => w.group === filterGroup);
+                }
+            }
+
+            // Apply favorites filter
+            if (showFavoritesOnly) {
+                filtered = filtered.filter(w => w.favorite);
+            }
+
+            // Apply sorting
+            filtered.sort((a, b) => {
+                switch (sortBy) {
+                    case 'date-desc':
+                        return b.createdAt - a.createdAt;
+                    case 'date-asc':
+                        return a.createdAt - b.createdAt;
+                    case 'alpha-asc':
+                        return a.word.localeCompare(b.word);
+                    case 'alpha-desc':
+                        return b.word.localeCompare(a.word);
+                    case 'group-asc':
+                        const groupA = a.group || '';
+                        const groupB = b.group || '';
+                        return groupA.localeCompare(groupB);
+                    case 'group-desc':
+                        const groupA2 = a.group || '';
+                        const groupB2 = b.group || '';
+                        return groupB2.localeCompare(groupA2);
+                    case 'mastery-desc':
+                        return (b.mastery || 0) - (a.mastery || 0);
+                    case 'mastery-asc':
+                        return (a.mastery || 0) - (b.mastery || 0);
+                    default:
+                        return 0;
+                }
+            });
+
+            // Create Excel workbook using SheetJS
+            const wb = XLSX.utils.book_new();
+            const wsData = [
+                ['Word', 'Definition', 'Bangla', 'Synonyms', 'Example', 'Category', 'Word Group']
+            ];
+
+            filtered.forEach(w => {
+                wsData.push([
                     w.word || '',
                     w.definition || '',
                     w.bangla || '',
-                    (w.synonyms ? w.synonyms.join(', ') : ''),
+                    w.synonyms ? w.synonyms.join(', ') : '',
                     w.example || '',
                     w.category || '',
                     w.group || ''
-                ].map(field => `"${field.replace(/"/g, '""')}"`).join(',');
-                content += row + '\n';
+                ]);
             });
 
-            const blob = new Blob([content], { type: 'text/csv' });
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+            XLSX.utils.book_append_sheet(wb, ws, 'Vocabulary');
+
+            // Generate Excel file
+            const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+            const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'vocabulary_export.csv';
+            a.download = 'vocabulary_export.xlsx';
             a.click();
             URL.revokeObjectURL(url);
         }
@@ -10714,6 +11309,7 @@
         let filterOpen = false;
         let sortOpen = false;
         let filterMode = 'category';
+        let showFavoritesOnly = false;
 
         function initWords() {
             $('listViewBtn').addEventListener('click', () => setViewMode('list'));
@@ -10870,11 +11466,14 @@
             options += `<div style="display:flex;border-bottom:1px solid #E5E7EB">`;
             options += `<div class="filter-tab ${filterMode === 'category' ? 'active' : ''}" data-tab="category" style="flex:1;padding:14px;text-align:center;font-weight:600;cursor:pointer;${filterMode === 'category' ? 'background:#6366F1;color:white' : 'color:#6B7280'};border-radius:16px 0 0 0">Category</div>`;
             options += `<div class="filter-tab ${filterMode === 'group' ? 'active' : ''}" data-tab="group" style="flex:1;padding:14px;text-align:center;font-weight:600;cursor:pointer;${filterMode === 'group' ? 'background:#6366F1;color:white' : 'color:#6B7280'};border-radius:0 16px 0 0">Word Group</div>`;
+            options += `<div class="filter-tab ${filterMode === 'favorites' ? 'active' : ''}" data-tab="favorites" style="flex:1;padding:14px;text-align:center;font-weight:600;cursor:pointer;${filterMode === 'favorites' ? 'background:#6366F1;color:white' : 'color:#6B7280'};border-radius:0 0 0 16px">Favorites</div>`;
             options += `</div>`;
 
-            // Show All Words option
-            const filterValue = filterMode === 'category' ? filterCategory : filterGroup;
-            options += `<div class="filter-option ${filterValue === 'all' ? 'active' : ''}" data-value="all" style="padding:16px 18px;cursor:pointer;font-weight:600;color:#1F2937;display:block;${filterValue === 'all' ? 'background:#EEF2FF;color:#6366F1' : ''}">All Words</div>`;
+            // Show All Words option (only for category and group modes)
+            if (filterMode === 'category' || filterMode === 'group') {
+                const filterValue = filterMode === 'category' ? filterCategory : filterGroup;
+                options += `<div class="filter-option ${filterValue === 'all' ? 'active' : ''}" data-value="all" style="padding:16px 18px;cursor:pointer;font-weight:600;color:#1F2937;display:block;${filterValue === 'all' ? 'background:#EEF2FF;color:#6366F1' : ''}">All Words</div>`;
+            }
 
             if (filterMode === 'category') {
                 // Category options
@@ -10883,7 +11482,7 @@
                     const isActive = filterCategory === c.id;
                     options += `<div class="filter-option cat-option" data-value="${c.id}" style="display:flex;align-items:center;gap:12px;padding:16px 18px;cursor:pointer;border-top:1px solid #F3F4F6;${isActive ? 'background:#EEF2FF' : ''}"><span style="width:14px;height:14px;border-radius:50%;background:${c.color};box-shadow:0 0 0 3px ${c.color}25"></span><span style="font-weight:500;color:${isActive ? '#6366F1' : '#1F2937'}">${c.name}</span></div>`;
                 });
-            } else {
+            } else if (filterMode === 'group') {
                 // Group options
                 if (AppData.groups.length === 0) {
                     options += `<div style="padding:20px;text-align:center;color:#9CA3AF;font-size:13px">No groups yet</div>`;
@@ -10893,6 +11492,10 @@
                         options += `<div class="filter-option group-option" data-value="${g.id}" style="display:flex;align-items:center;gap:12px;padding:16px 18px;cursor:pointer;border-top:1px solid #F3F4F6;${isActive ? 'background:#EEF2FF' : ''}"><span style="width:14px;height:14px;border-radius:50%;background:${g.color};box-shadow:0 0 0 3px ${g.color}25"></span><span style="font-weight:500;color:${isActive ? '#6366F1' : '#1F2937'}">${g.name}</span></div>`;
                     });
                 }
+            } else if (filterMode === 'favorites') {
+                // Favorites options
+                options += `<div class="filter-option ${showFavoritesOnly ? 'active' : ''}" data-value="true" style="padding:16px 18px;cursor:pointer;font-weight:600;color:#1F2937;display:block;${showFavoritesOnly ? 'background:#EEF2FF;color:#6366F1' : ''}">Show Favorites Only</div>`;
+                options += `<div class="filter-option ${!showFavoritesOnly ? 'active' : ''}" data-value="false" style="padding:16px 18px;cursor:pointer;font-weight:600;color:#1F2937;display:block;${!showFavoritesOnly ? 'background:#EEF2FF;color:#6366F1' : ''}">Show All Words</div>`;
             }
 
             options += '</div>';
@@ -10917,8 +11520,10 @@
                     const value = e.currentTarget.dataset.value;
                     if (filterMode === 'category') {
                         filterCategory = value;
-                    } else {
+                    } else if (filterMode === 'group') {
                         filterGroup = value;
+                    } else if (filterMode === 'favorites') {
+                        showFavoritesOnly = value === 'true';
                     }
                     filterOpen = false;
                     renderFilterDropdown();
@@ -10955,6 +11560,8 @@
                 { value: 'date-asc', label: 'Oldest First' },
                 { value: 'alpha-asc', label: 'A → Z' },
                 { value: 'alpha-desc', label: 'Z → A' },
+                { value: 'group-asc', label: 'Word Group (A → Z)' },
+                { value: 'group-desc', label: 'Word Group (Z → A)' },
                 { value: 'mastery-desc', label: 'Highest Mastery' },
                 { value: 'mastery-asc', label: 'Lowest Mastery' }
             ];
@@ -11028,6 +11635,11 @@
                 }
             }
 
+            // Apply favorites filter
+            if (showFavoritesOnly) {
+                filtered = filtered.filter(w => w.favorite);
+            }
+
             // Apply sorting
             filtered.sort((a, b) => {
                 switch (sortBy) {
@@ -11039,6 +11651,14 @@
                         return a.word.localeCompare(b.word);
                     case 'alpha-desc':
                         return b.word.localeCompare(a.word);
+                    case 'group-asc':
+                        const groupA = a.group || '';
+                        const groupB = b.group || '';
+                        return groupA.localeCompare(groupB);
+                    case 'group-desc':
+                        const groupA2 = a.group || '';
+                        const groupB2 = b.group || '';
+                        return groupB2.localeCompare(groupA2);
                     case 'mastery-desc':
                         return (b.mastery || 0) - (a.mastery || 0);
                     case 'mastery-asc':
@@ -11394,24 +12014,24 @@
             document.querySelector('.modal-overlay')?.remove();
         };
 
-         window.performDelete = async id => {
-             const word = AppData.words.find(w => w.id === id);
-             AppData.words = AppData.words.filter(w => w.id !== id);
-             saveData();
-             closeConfirmModal();
-             renderWords();
-             updateHome();
-             showToast('Word deleted', 'warning');
+        window.performDelete = async id => {
+            const word = AppData.words.find(w => w.id === id);
+            AppData.words = AppData.words.filter(w => w.id !== id);
+            saveData();
+            closeConfirmModal();
+            renderWords();
+            updateHome();
+            showToast('Word deleted', 'warning');
 
-             // Sync delete to Supabase only if word has been synced (positive numeric ID)
-             if (currentUser && word && parseInt(word.id) > 0) {
-                 SyncService.deleteWordFromServer(word.id).catch(err => {
-                     console.error('Background delete sync failed:', err);
-                 });
-             }
-             // Sync updated stats (total words count)
-             SyncService.uploadStats().catch(() => {});
-         };
+            // Sync delete to Supabase only if word has been synced (positive numeric ID)
+            if (currentUser && word && parseInt(word.id) > 0) {
+                SyncService.deleteWordFromServer(word.id).catch(err => {
+                    console.error('Background delete sync failed:', err);
+                });
+            }
+            // Sync updated stats (total words count)
+            SyncService.uploadStats().catch(() => { });
+        };
 
         window.editWord = wordId => {
             const word = AppData.words.find(w => w.id === wordId);
@@ -12195,17 +12815,17 @@
                 }
             }
 
-             AppData.stats.activities.unshift({
-                 text: `Scored ${accuracy}% on ${quizState.mode} quiz`,
-                 time: Date.now(),
-                 type: 'quiz',
-                 xp: quizState.sessionXP
-             });
+            AppData.stats.activities.unshift({
+                text: `Scored ${accuracy}% on ${quizState.mode} quiz`,
+                time: Date.now(),
+                type: 'quiz',
+                xp: quizState.sessionXP
+            });
 
-             saveData();
-             // Sync updated stats to Supabase
-             SyncService.uploadStats().catch(() => {});
-         }
+            saveData();
+            // Sync updated stats to Supabase
+            SyncService.uploadStats().catch(() => { });
+        }
 
         function createSoftConfetti() {
             const container = $('softConfettiContainer');
@@ -12289,16 +12909,16 @@
             $('importFileInput').addEventListener('change', e => handleImport(e.target.files[0]));
 
             // Danger zone
-             $('resetStatsBtn').addEventListener('click', () => {
-                 if (confirm('Reset all statistics? This cannot be undone.')) {
-                     AppData.stats = { totalQuizzes: 0, correctAnswers: 0, totalAnswers: 0, streakDays: 0, bestStreak: 0, lastQuizDate: null, xp: 0, level: 1, dailyGoal: 10, todayProgress: 0, activities: [] };
-                     saveData();
-                     updateStats();
-                     showToast('Statistics reset');
-                     // Sync reset to server
-                     SyncService.uploadStats().catch(() => {});
-                 }
-             });
+            $('resetStatsBtn').addEventListener('click', () => {
+                if (confirm('Reset all statistics? This cannot be undone.')) {
+                    AppData.stats = { totalQuizzes: 0, correctAnswers: 0, totalAnswers: 0, streakDays: 0, bestStreak: 0, lastQuizDate: null, xp: 0, level: 1, dailyGoal: 10, todayProgress: 0, activities: [] };
+                    saveData();
+                    updateStats();
+                    showToast('Statistics reset');
+                    // Sync reset to server
+                    SyncService.uploadStats().catch(() => { });
+                }
+            });
 
             $('deleteAllBtn').addEventListener('click', async () => {
                 if (confirm('DELETE ALL WORDS? This is irreversible!')) {
@@ -12315,12 +12935,12 @@
                             showToast('Server delete failed - will clear locally', 'warning');
                         }
                     }
-                     AppData.words = [];
-                     saveData();
-                     updateStats();
-                     showToast('All words deleted', 'error');
-                     // Sync stats (word count) to server
-                     SyncService.uploadStats().catch(() => {});
+                    AppData.words = [];
+                    saveData();
+                    updateStats();
+                    showToast('All words deleted', 'error');
+                    // Sync stats (word count) to server
+                    SyncService.uploadStats().catch(() => { });
                 }
             });
 
@@ -12359,17 +12979,17 @@
                                     skipCount++;
                                     return;
                                 }
-                                 AppData.words.push({
-                                     ...word,
-                                     id: generateId(),
-                                     mastery: word.mastery || 0,
-                                     createdAt: word.createdAt || Date.now(),
-                                     updatedAt: word.updatedAt || Date.now(),
-                                     nextReview: Date.now() + 86400000,
-                                     favorite: false,
-                                     practice: false,
-                                     quiz: false
-                                 });
+                                AppData.words.push({
+                                    ...word,
+                                    id: generateId(),
+                                    mastery: word.mastery || 0,
+                                    createdAt: word.createdAt || Date.now(),
+                                    updatedAt: word.updatedAt || Date.now(),
+                                    nextReview: Date.now() + 86400000,
+                                    favorite: false,
+                                    practice: false,
+                                    quiz: false
+                                });
                                 importCount++;
                             });
                         } else {
@@ -12395,35 +13015,35 @@
                             const categoryId = (values[5] || 'general').toString().toLowerCase().replace(/\s+/g, '_');
 
                             // Auto-create category if not exists
-                                 if (!AppData.categories.find(c => c.id === categoryId || c.name.toLowerCase() === (values[5] || 'general').toString().toLowerCase())) {
-                                     const catColors = ['#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899', '#6B7280', '#14B8A6', '#F97316'];
-                                     const newCat = {
-                                         id: categoryId,
-                                         name: values[5] || 'General',
-                                         color: catColors[AppData.categories.length % catColors.length]
-                                     };
-                                     AppData.categories.push(newCat);
-                                     // Sync new category
-                                     SyncService.uploadCategory(newCat).catch(() => {});
-                                 }
+                            if (!AppData.categories.find(c => c.id === categoryId || c.name.toLowerCase() === (values[5] || 'general').toString().toLowerCase())) {
+                                const catColors = ['#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899', '#6B7280', '#14B8A6', '#F97316'];
+                                const newCat = {
+                                    id: categoryId,
+                                    name: values[5] || 'General',
+                                    color: catColors[AppData.categories.length % catColors.length]
+                                };
+                                AppData.categories.push(newCat);
+                                // Sync new category
+                                SyncService.uploadCategory(newCat).catch(() => { });
+                            }
 
-                             // Auto-create group if not exists
-                             if (values[6]) {
-                                 const groupName = values[6].toString();
-                                 const groupId = groupName.toLowerCase().replace(/\s+/g, '_');
-                                 if (!AppData.groups.find(g => g.id === groupId || g.name.toLowerCase() === groupName.toLowerCase())) {
-                                     const groupColors = ['#6B7280', '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#14B8A6', '#F97316', '#6366F1'];
-                                     const newGroup = {
-                                         id: groupId,
-                                         name: groupName,
-                                         color: groupColors[AppData.groups.length % groupColors.length],
-                                         desc: ''
-                                     };
-                                     AppData.groups.push(newGroup);
-                                     // Sync new group
-                                     SyncService.uploadGroup(newGroup).catch(() => {});
-                                 }
-                             }
+                            // Auto-create group if not exists
+                            if (values[6]) {
+                                const groupName = values[6].toString();
+                                const groupId = groupName.toLowerCase().replace(/\s+/g, '_');
+                                if (!AppData.groups.find(g => g.id === groupId || g.name.toLowerCase() === groupName.toLowerCase())) {
+                                    const groupColors = ['#6B7280', '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#14B8A6', '#F97316', '#6366F1'];
+                                    const newGroup = {
+                                        id: groupId,
+                                        name: groupName,
+                                        color: groupColors[AppData.groups.length % groupColors.length],
+                                        desc: ''
+                                    };
+                                    AppData.groups.push(newGroup);
+                                    // Sync new group
+                                    SyncService.uploadGroup(newGroup).catch(() => { });
+                                }
+                            }
 
                             AppData.words.push({
                                 id: generateId(),
@@ -12468,59 +13088,59 @@
                             const categoryId = (row[5] || 'general').toString().toLowerCase().replace(/\s+/g, '_');
                             const groupName = row[6] ? row[6].toString() : null;
 
-                             // Auto-create category if not exists
-                             if (!AppData.categories.find(c => c.id === categoryId || c.name.toLowerCase() === (row[5] || 'general').toString().toLowerCase())) {
-                                 const catColors = ['#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899', '#6B7280', '#14B8A6', '#F97316'];
-                                 const newCat = {
-                                     id: categoryId,
-                                     name: row[5] || 'General',
-                                     color: catColors[AppData.categories.length % catColors.length]
-                                 };
-                                 AppData.categories.push(newCat);
-                                 // Sync new category
-                                 SyncService.uploadCategory(newCat).catch(() => {});
-                             }
+                            // Auto-create category if not exists
+                            if (!AppData.categories.find(c => c.id === categoryId || c.name.toLowerCase() === (row[5] || 'general').toString().toLowerCase())) {
+                                const catColors = ['#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899', '#6B7280', '#14B8A6', '#F97316'];
+                                const newCat = {
+                                    id: categoryId,
+                                    name: row[5] || 'General',
+                                    color: catColors[AppData.categories.length % catColors.length]
+                                };
+                                AppData.categories.push(newCat);
+                                // Sync new category
+                                SyncService.uploadCategory(newCat).catch(() => { });
+                            }
 
-                             // Auto-create group if not exists
-                             if (groupName) {
-                                 const groupId = groupName.toLowerCase().replace(/\s+/g, '_');
-                                 if (!AppData.groups.find(g => g.id === groupId || g.name.toLowerCase() === groupName.toLowerCase())) {
-                                     const groupColors = ['#6B7280', '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#14B8A6', '#F97316', '#6366F1'];
-                                     const newGroup = {
-                                         id: groupId,
-                                         name: groupName,
-                                         color: groupColors[AppData.groups.length % groupColors.length],
-                                         desc: ''
-                                     };
-                                     AppData.groups.push(newGroup);
-                                     // Sync new group
-                                     SyncService.uploadGroup(newGroup).catch(() => {});
-                                 }
-                             }
+                            // Auto-create group if not exists
+                            if (groupName) {
+                                const groupId = groupName.toLowerCase().replace(/\s+/g, '_');
+                                if (!AppData.groups.find(g => g.id === groupId || g.name.toLowerCase() === groupName.toLowerCase())) {
+                                    const groupColors = ['#6B7280', '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#14B8A6', '#F97316', '#6366F1'];
+                                    const newGroup = {
+                                        id: groupId,
+                                        name: groupName,
+                                        color: groupColors[AppData.groups.length % groupColors.length],
+                                        desc: ''
+                                    };
+                                    AppData.groups.push(newGroup);
+                                    // Sync new group
+                                    SyncService.uploadGroup(newGroup).catch(() => { });
+                                }
+                            }
 
-                             // Map columns: word, definition, bangla, synonyms, example, category, word_group, mastery
-                             AppData.words.push({
-                                 id: generateId(),
-                                 word: wordText,
-                                 definition: row[1] || '',
-                                 bangla: row[2] || '',
-                                 synonyms: row[3] ? row[3].toString().split(';').map(s => s.trim()) : [],
-                                 example: row[4] || '',
-                                 category: categoryId,
-                                 group: groupName ? groupName.toLowerCase().replace(/\s+/g, '_') : '',
-                                 mastery: parseInt(row[7]) || 0,
-                                 createdAt: Date.now(),
-                                 updatedAt: Date.now(),
-                                 nextReview: Date.now() + 86400000,
-                                 favorite: false,
-                                 practice: false,
-                                 quiz: false
-                             });
+                            // Map columns: word, definition, bangla, synonyms, example, category, word_group, mastery
+                            AppData.words.push({
+                                id: generateId(),
+                                word: wordText,
+                                definition: row[1] || '',
+                                bangla: row[2] || '',
+                                synonyms: row[3] ? row[3].toString().split(';').map(s => s.trim()) : [],
+                                example: row[4] || '',
+                                category: categoryId,
+                                group: groupName ? groupName.toLowerCase().replace(/\s+/g, '_') : '',
+                                mastery: parseInt(row[7]) || 0,
+                                createdAt: Date.now(),
+                                updatedAt: Date.now(),
+                                nextReview: Date.now() + 86400000,
+                                favorite: false,
+                                practice: false,
+                                quiz: false
+                            });
                             importCount++;
                         }
                     }
                     saveData();
-                    
+
                     // Upload imported words to Supabase
                     if (currentUser) {
                         // Show loading overlay
@@ -12568,14 +13188,14 @@
                     } else {
                         showToast(`Imported ${importCount} words successfully!`, 'success');
                     }
-                     
-                     if (skipCount > 0) {
-                         showToast(`${skipCount} duplicates skipped.`, 'warning');
-                     }
-                     updateStats();
-                     // Sync stats to server after import
-                     SyncService.uploadStats().catch(() => {});
-                 } catch (err) {
+
+                    if (skipCount > 0) {
+                        showToast(`${skipCount} duplicates skipped.`, 'warning');
+                    }
+                    updateStats();
+                    // Sync stats to server after import
+                    SyncService.uploadStats().catch(() => { });
+                } catch (err) {
                     showToast('Import failed: ' + err.message, 'error');
                 }
             };
@@ -12862,15 +13482,15 @@
                         return;
                     }
 
-                     const newCategory = {
-                         id: generateUUID(),
-                         name: name,
-                         color: selectedColor
-                     };
-                     AppData.categories.push(newCategory);
-                     showToast('Category created!', 'success');
-                     // Sync category to Supabase
-                     SyncService.uploadCategory(newCategory).catch(() => {});
+                    const newCategory = {
+                        id: generateUUID(),
+                        name: name,
+                        color: selectedColor
+                    };
+                    AppData.categories.push(newCategory);
+                    showToast('Category created!', 'success');
+                    // Sync category to Supabase
+                    SyncService.uploadCategory(newCategory).catch(() => { });
                 } else if (modalAction === 'edit' && modalEditId) {
                     const category = AppData.categories.find(c => c.id === modalEditId);
                     if (category) {
@@ -12879,11 +13499,11 @@
                             showToast('Category name already exists', 'error');
                             return;
                         }
-                         category.name = name;
-                         category.color = selectedColor;
-                         showToast('Category updated!', 'success');
-                         // Sync category update to Supabase
-                         SyncService.uploadCategory(category).catch(() => {});
+                        category.name = name;
+                        category.color = selectedColor;
+                        showToast('Category updated!', 'success');
+                        // Sync category update to Supabase
+                        SyncService.uploadCategory(category).catch(() => { });
                     }
                 }
             } else if (modalMode === 'group') {
@@ -12899,10 +13519,10 @@
                         name: name,
                         color: selectedColor
                     };
-                     AppData.groups.push(newGroup);
-                     showToast('Word group created!', 'success');
-                     // Sync group to Supabase
-                     SyncService.uploadGroup(newGroup).catch(() => {});
+                    AppData.groups.push(newGroup);
+                    showToast('Word group created!', 'success');
+                    // Sync group to Supabase
+                    SyncService.uploadGroup(newGroup).catch(() => { });
                 } else if (modalAction === 'edit' && modalEditId) {
                     const group = AppData.groups.find(g => g.id === modalEditId);
                     if (group) {
@@ -12911,11 +13531,11 @@
                             showToast('Group name already exists', 'error');
                             return;
                         }
-                         group.name = name;
-                         group.color = selectedColor;
-                         showToast('Word group updated!', 'success');
-                         // Sync group update to Supabase
-                         SyncService.uploadGroup(group).catch(() => {});
+                        group.name = name;
+                        group.color = selectedColor;
+                        showToast('Word group updated!', 'success');
+                        // Sync group update to Supabase
+                        SyncService.uploadGroup(group).catch(() => { });
                     }
                 }
             }
@@ -12933,71 +13553,71 @@
             openManageModal('group', 'edit', id);
         }
 
-         function deleteCategory(id) {
-             const category = AppData.categories.find(c => c.id === id);
-             if (!category) return;
+        function deleteCategory(id) {
+            const category = AppData.categories.find(c => c.id === id);
+            if (!category) return;
 
-             const wordCount = AppData.words.filter(w => w.category === id).length;
-             let confirmMsg = `Delete "${category.name}"?`;
-             if (wordCount > 0) {
-                 confirmMsg += `\n\n${wordCount} word${wordCount !== 1 ? 's' : ''} will be moved to "Uncategorized".`;
-             }
+            const wordCount = AppData.words.filter(w => w.category === id).length;
+            let confirmMsg = `Delete "${category.name}"?`;
+            if (wordCount > 0) {
+                confirmMsg += `\n\n${wordCount} word${wordCount !== 1 ? 's' : ''} will be moved to "Uncategorized".`;
+            }
 
-             if (confirm(confirmMsg)) {
-                 // Move words to uncategorized (general)
-                 const affectedWords = [];
-                 AppData.words.forEach(w => {
-                     if (w.category === id) {
-                         w.category = 'general';
-                         affectedWords.push(w);
-                     }
-                 });
+            if (confirm(confirmMsg)) {
+                // Move words to uncategorized (general)
+                const affectedWords = [];
+                AppData.words.forEach(w => {
+                    if (w.category === id) {
+                        w.category = 'general';
+                        affectedWords.push(w);
+                    }
+                });
 
-                 // Remove category
-                 AppData.categories = AppData.categories.filter(c => c.id !== id);
-                 saveData();
-                 updateStats();
-                 showToast('Category deleted', 'success');
+                // Remove category
+                AppData.categories = AppData.categories.filter(c => c.id !== id);
+                saveData();
+                updateStats();
+                showToast('Category deleted', 'success');
 
-                 // Sync affected words to server
-                 affectedWords.forEach(w => SyncService.uploadWord(w).catch(() => {}));
-                 // Delete category from server
-                 SyncService.deleteCategoryFromServer(id).catch(() => {});
-             }
-         }
+                // Sync affected words to server
+                affectedWords.forEach(w => SyncService.uploadWord(w).catch(() => { }));
+                // Delete category from server
+                SyncService.deleteCategoryFromServer(id).catch(() => { });
+            }
+        }
 
-         function deleteGroup(id) {
-             const group = AppData.groups.find(g => g.id === id);
-             if (!group) return;
+        function deleteGroup(id) {
+            const group = AppData.groups.find(g => g.id === id);
+            if (!group) return;
 
-             const wordCount = AppData.words.filter(w => w.group === id).length;
-             let confirmMsg = `Delete "${group.name}"?`;
-             if (wordCount > 0) {
-                 confirmMsg += `\n\n${wordCount} word${wordCount !== 1 ? 's' : ''} will be removed from this group.`;
-             }
+            const wordCount = AppData.words.filter(w => w.group === id).length;
+            let confirmMsg = `Delete "${group.name}"?`;
+            if (wordCount > 0) {
+                confirmMsg += `\n\n${wordCount} word${wordCount !== 1 ? 's' : ''} will be removed from this group.`;
+            }
 
-             if (confirm(confirmMsg)) {
-                 // Remove group from words
-                 const affectedWords = [];
-                 AppData.words.forEach(w => {
-                     if (w.group === id) {
-                         w.group = null;
-                         affectedWords.push(w);
-                     }
-                 });
+            if (confirm(confirmMsg)) {
+                // Remove group from words
+                const affectedWords = [];
+                AppData.words.forEach(w => {
+                    if (w.group === id) {
+                        w.group = null;
+                        affectedWords.push(w);
+                    }
+                });
 
-                 // Remove group
-                 AppData.groups = AppData.groups.filter(g => g.id !== id);
-                 saveData();
-                 updateStats();
-                 showToast('Word group deleted', 'success');
+                // Remove group
+                AppData.groups = AppData.groups.filter(g => g.id !== id);
+                saveData();
+                updateStats();
+                showToast('Word group deleted', 'success');
 
-                 // Sync affected words to server
-                 affectedWords.forEach(w => SyncService.uploadWord(w).catch(() => {}));
-                 // Delete group from server
-                 SyncService.deleteGroupFromServer(id).catch(() => {});
-             }
-         }
+                // Sync affected words to server
+                affectedWords.forEach(w => SyncService.uploadWord(w).catch(() => { }));
+                // Delete group from server
+                SyncService.deleteGroupFromServer(id).catch(() => { });
+            }
+        }
 
         // Close modal on overlay click
         $('manageModal')?.addEventListener('click', (e) => {
@@ -13308,36 +13928,36 @@
             async uploadWord(word) {
                 if (!currentUser) return;
 
-                 // Use word name + user_id as natural key for conflict resolution
-                 const wordForSupabase = {
-                     user_id: currentUser.id,
-                     client_id: this.getClientId(),
-                     word: word.word,
-                     definition: word.definition || null,
-                     bangla: word.bangla || null,
-                     synonyms: word.synonyms || [],
-                     example: word.example || null,
-                     category: word.category || 'general',
-                     "group": word.group || null,
-                     mastery: word.mastery || 0,
-                     favorite: word.favorite || false,
-                     practice: word.practice || false,
-                     quiz: word.quiz || false,
-                     word_xp: word.xp || 0,
-                     added_date: word.addedDate || new Date().toISOString().split('T')[0],
-                     next_review_date: word.nextReview ? new Date(word.nextReview).toISOString() : null,
-                     created_at: word.createdAt ? new Date(word.createdAt).toISOString() : new Date().toISOString(),
-                     updated_at: word.updatedAt ? new Date(word.updatedAt).toISOString() : new Date().toISOString()
-                 };
+                // Use word name + user_id as natural key for conflict resolution
+                const wordForSupabase = {
+                    user_id: currentUser.id,
+                    client_id: this.getClientId(),
+                    word: word.word,
+                    definition: word.definition || null,
+                    bangla: word.bangla || null,
+                    synonyms: word.synonyms || [],
+                    example: word.example || null,
+                    category: word.category || 'general',
+                    "group": word.group || null,
+                    mastery: word.mastery || 0,
+                    favorite: word.favorite || false,
+                    practice: word.practice || false,
+                    quiz: word.quiz || false,
+                    word_xp: word.xp || 0,
+                    added_date: word.addedDate || new Date().toISOString().split('T')[0],
+                    next_review_date: word.nextReview ? new Date(word.nextReview).toISOString() : null,
+                    created_at: word.createdAt ? new Date(word.createdAt).toISOString() : new Date().toISOString(),
+                    updated_at: word.updatedAt ? new Date(word.updatedAt).toISOString() : new Date().toISOString()
+                };
 
                 console.log('📤 Uploading word:', word.word, 'favorite:', word.favorite);
-                
+
                 // Use upsert with word name + user_id as conflict target
                 const { data, error } = await supabaseClient
                     .from('words')
-                    .upsert(wordForSupabase, { 
+                    .upsert(wordForSupabase, {
                         onConflict: ['word', 'user_id'],
-                        ignoreDuplicates: false 
+                        ignoreDuplicates: false
                     })
                     .select();
 
@@ -13347,17 +13967,17 @@
                     return false;
                 }
 
-                 // Update local word with Supabase-generated ID if available
-                 if (data && data.length > 0 && data[0].id) {
-                     word.id = String(data[0].id);
-                     console.log('✅ Word synced with new id:', word.id);
-                 } else {
-                     console.log('✅ Word synced to server');
-                 }
+                // Update local word with Supabase-generated ID if available
+                if (data && data.length > 0 && data[0].id) {
+                    word.id = String(data[0].id);
+                    console.log('✅ Word synced with new id:', word.id);
+                } else {
+                    console.log('✅ Word synced to server');
+                }
 
-                 // Refresh UI to reflect any ID changes and sync state
-                 refreshCurrentView();
-                 return true;
+                // Refresh UI to reflect any ID changes and sync state
+                refreshCurrentView();
+                return true;
             },
 
             async deleteWordFromServer(wordId) {
@@ -13404,7 +14024,7 @@
                         AppData.categories.push(defaultCat);
                     }
                     // Upload to server (idempotent)
-                    this.uploadCategory(defaultCat).catch(() => {});
+                    this.uploadCategory(defaultCat).catch(() => { });
                 }
                 refreshCurrentView();
             },
@@ -13472,7 +14092,7 @@
                         AppData.groups.push(defaultGroup);
                     }
                     // Upload to server (idempotent)
-                    this.uploadGroup(defaultGroup).catch(() => {});
+                    this.uploadGroup(defaultGroup).catch(() => { });
                 }
                 refreshCurrentView();
             },
@@ -13775,45 +14395,45 @@
                 console.log('📡 Word progress synced from another device');
             },
 
-             mapSupabaseWordToLocal(supabaseWord) {
-                 // Parse synonyms - could be JSON string or array
-                 let synonyms = [];
-                 try {
-                     if (typeof supabaseWord.synonyms === 'string') {
-                         synonyms = JSON.parse(supabaseWord.synonyms);
-                     } else if (Array.isArray(supabaseWord.synonyms)) {
-                         synonyms = supabaseWord.synonyms;
-                     }
-                 } catch (e) {
-                     synonyms = [];
-                 }
-                 
-                 // Ensure ID is always a string
-                 const wordId = supabaseWord.id ? String(supabaseWord.id) : '';
-                 if (!wordId) {
-                     console.error('Word ID is missing from Supabase!', supabaseWord);
-                 }
-                 
-                 return {
-                     id: wordId,
-                     word: supabaseWord.word || '',
-                     definition: supabaseWord.definition || '',
-                     bangla: supabaseWord.bangla || '',
-                     synonyms: synonyms,
-                     example: supabaseWord.example || '',
-                     category: supabaseWord.category || 'general',
-                     group: supabaseWord.group || supabaseWord['group'] || 'default',
-                     mastery: supabaseWord.mastery || 0,
-                     favorite: supabaseWord.favorite || false,
-                     practice: supabaseWord.practice || false,
-                     quiz: supabaseWord.quiz || false,
-                     xp: supabaseWord.word_xp || 0,
-                     addedDate: supabaseWord.added_date ? (typeof supabaseWord.added_date === 'string' ? supabaseWord.added_date : supabaseWord.added_date.toString().split('T')[0]) : new Date().toISOString().split('T')[0],
-                     nextReview: supabaseWord.next_review_date ? new Date(supabaseWord.next_review_date).getTime() : null,
-                     createdAt: supabaseWord.created_at ? new Date(supabaseWord.created_at).getTime() : Date.now(),
-                     updatedAt: supabaseWord.updated_at ? new Date(supabaseWord.updated_at).getTime() : Date.now()
-                 };
-             },
+            mapSupabaseWordToLocal(supabaseWord) {
+                // Parse synonyms - could be JSON string or array
+                let synonyms = [];
+                try {
+                    if (typeof supabaseWord.synonyms === 'string') {
+                        synonyms = JSON.parse(supabaseWord.synonyms);
+                    } else if (Array.isArray(supabaseWord.synonyms)) {
+                        synonyms = supabaseWord.synonyms;
+                    }
+                } catch (e) {
+                    synonyms = [];
+                }
+
+                // Ensure ID is always a string
+                const wordId = supabaseWord.id ? String(supabaseWord.id) : '';
+                if (!wordId) {
+                    console.error('Word ID is missing from Supabase!', supabaseWord);
+                }
+
+                return {
+                    id: wordId,
+                    word: supabaseWord.word || '',
+                    definition: supabaseWord.definition || '',
+                    bangla: supabaseWord.bangla || '',
+                    synonyms: synonyms,
+                    example: supabaseWord.example || '',
+                    category: supabaseWord.category || 'general',
+                    group: supabaseWord.group || supabaseWord['group'] || 'default',
+                    mastery: supabaseWord.mastery || 0,
+                    favorite: supabaseWord.favorite || false,
+                    practice: supabaseWord.practice || false,
+                    quiz: supabaseWord.quiz || false,
+                    xp: supabaseWord.word_xp || 0,
+                    addedDate: supabaseWord.added_date ? (typeof supabaseWord.added_date === 'string' ? supabaseWord.added_date : supabaseWord.added_date.toString().split('T')[0]) : new Date().toISOString().split('T')[0],
+                    nextReview: supabaseWord.next_review_date ? new Date(supabaseWord.next_review_date).getTime() : null,
+                    createdAt: supabaseWord.created_at ? new Date(supabaseWord.created_at).getTime() : Date.now(),
+                    updatedAt: supabaseWord.updated_at ? new Date(supabaseWord.updated_at).getTime() : Date.now()
+                };
+            },
 
             getClientId() {
                 let clientId = localStorage.getItem('vocavera_client_id');
@@ -13846,7 +14466,7 @@
 
         // Wrap original saveData to also sync
         const originalSaveData = saveData;
-        saveData = function() {
+        saveData = function () {
             originalSaveData();
             // Sync will happen on next idle moment or explicit call
         };
@@ -13897,19 +14517,19 @@
         async function initializeAppWithSync() {
             // Initialize with default values (server-only mode)
             AppData.words = [];
-            AppData.stats = { 
-                todayProgress: 0, 
-                dailyGoal: 5, 
-                streakDays: 0, 
-                xp: 0, 
-                level: 1, 
-                correctAnswers: 0, 
+            AppData.stats = {
+                todayProgress: 0,
+                dailyGoal: 5,
+                streakDays: 0,
+                xp: 0,
+                level: 1,
+                correctAnswers: 0,
                 totalAnswers: 0,
-                activities: [] 
+                activities: []
             };
             AppData.settings = { theme: 'light', notifications: true, dailyReminder: true, reminderTime: '08:00' };
             AppData.filters = { category: 'all', group: 'all', search: '' };
-            
+
             // Show app UI
             showApp();
 
@@ -13937,74 +14557,74 @@
 
 
 
-            // Register Service Worker with update detection
-            if ('serviceWorker' in navigator) {
-                let swRegistration = null;
-                let installingWorker = null;
+        // Register Service Worker with update detection
+        if ('serviceWorker' in navigator) {
+            let swRegistration = null;
+            let installingWorker = null;
 
-                navigator.serviceWorker.register('./sw.js')
-                  .then((reg) => {
+            navigator.serviceWorker.register('./sw.js')
+                .then((reg) => {
                     console.log('✅ Service Worker registered:', reg.scope);
                     swRegistration = reg;
 
                     // Check for updates every 3 minutes
                     setInterval(() => {
-                      reg.update();
+                        reg.update();
                     }, 3 * 60 * 1000);
 
                     // Listen for update found
                     reg.addEventListener('updatefound', () => {
-                      installingWorker = reg.installing;
-                      console.log('🔄 New service worker found...');
+                        installingWorker = reg.installing;
+                        console.log('🔄 New service worker found...');
 
-                      installingWorker.addEventListener('statechange', () => {
-                        if (installingWorker.state === 'installed') {
-                          if (navigator.serviceWorker.controller) {
-                            // New version available, show update prompt
-                            showUpdatePrompt(() => {
-                              // Skip waiting and activate
-                              installingWorker.postMessage({ type: 'SKIP_WAITING' });
-                            });
-                          } else {
-                            // First install, just activate
-                            console.log('✅ SW ready (first install)');
-                          }
-                        }
-                        if (installingWorker.state === 'activated' && navigator.serviceWorker.controller) {
-                          // Update completed, reload
-                          window.location.reload();
-                        }
-                      });
+                        installingWorker.addEventListener('statechange', () => {
+                            if (installingWorker.state === 'installed') {
+                                if (navigator.serviceWorker.controller) {
+                                    // New version available, show update prompt
+                                    showUpdatePrompt(() => {
+                                        // Skip waiting and activate
+                                        installingWorker.postMessage({ type: 'SKIP_WAITING' });
+                                    });
+                                } else {
+                                    // First install, just activate
+                                    console.log('✅ SW ready (first install)');
+                                }
+                            }
+                            if (installingWorker.state === 'activated' && navigator.serviceWorker.controller) {
+                                // Update completed, reload
+                                window.location.reload();
+                            }
+                        });
                     });
 
                     // Listen for controller change (another tab triggered update)
                     navigator.serviceWorker.addEventListener('controllerchange', () => {
-                      if (swRegistration && installingWorker) {
-                        // New SW now controlling, reload to get fresh content
-                        window.location.reload();
-                      }
+                        if (swRegistration && installingWorker) {
+                            // New SW now controlling, reload to get fresh content
+                            window.location.reload();
+                        }
                     });
 
                     // Listen for messages from SW
                     navigator.serviceWorker.addEventListener('message', (event) => {
-                      if (event.data.type === 'SW_UPDATE_AVAILABLE') {
-                        showUpdatePrompt(() => {
-                          window.location.reload();
-                        });
-                      }
+                        if (event.data.type === 'SW_UPDATE_AVAILABLE') {
+                            showUpdatePrompt(() => {
+                                window.location.reload();
+                            });
+                        }
                     });
-                  })
-                  .catch((err) => console.log('❌ SW registration failed:', err));
-            }
+                })
+                .catch((err) => console.log('❌ SW registration failed:', err));
+        }
 
-            // Update prompt UI
-            function showUpdatePrompt(onUpdate) {
-              // Prevent multiple prompts
-              if (document.getElementById('sw-update-prompt')) return;
+        // Update prompt UI
+        function showUpdatePrompt(onUpdate) {
+            // Prevent multiple prompts
+            if (document.getElementById('sw-update-prompt')) return;
 
-              const prompt = document.createElement('div');
-              prompt.id = 'sw-update-prompt';
-              prompt.style.cssText = `
+            const prompt = document.createElement('div');
+            prompt.id = 'sw-update-prompt';
+            prompt.style.cssText = `
                 position: fixed;
                 bottom: 80px;
                 left: 50%;
@@ -14022,7 +14642,7 @@
                 color: #374151;
                 animation: slideUpFade 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
               `;
-              prompt.innerHTML = `
+            prompt.innerHTML = `
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 4v12" />
                 </svg>
@@ -14038,39 +14658,39 @@
                   font-size: 13px;
                 ">Update</button>
               `;
-              document.body.appendChild(prompt);
+            document.body.appendChild(prompt);
 
-              document.getElementById('sw-update-btn').addEventListener('click', () => {
+            document.getElementById('sw-update-btn').addEventListener('click', () => {
                 prompt.remove();
                 onUpdate();
-              });
+            });
 
-              // Auto-dismiss after 20s
-              setTimeout(() => prompt.remove(), 20000);
-            }
+            // Auto-dismiss after 20s
+            setTimeout(() => prompt.remove(), 20000);
+        }
 
-            // Add CSS for update prompt animation
-            const style = document.createElement('style');
-            style.textContent = `
+        // Add CSS for update prompt animation
+        const style = document.createElement('style');
+        style.textContent = `
               @keyframes slideUpFade {
                 from { opacity: 0; transform: translateX(-50%) translateY(20px); }
                 to { opacity: 1; transform: translateX(-50%) translateY(0); }
               }
             `;
-            document.head.appendChild(style);
+        document.head.appendChild(style);
 
-            // Initialize event listeners
-            init();
+        // Initialize event listeners
+        init();
 
-            // Force service worker update check on load (helps with deployments)
-            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-                navigator.serviceWorker.controller.postMessage({ type: 'GET_VERSION' });
-            }
+        // Force service worker update check on load (helps with deployments)
+        if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+            navigator.serviceWorker.controller.postMessage({ type: 'GET_VERSION' });
+        }
 
-            // Start app if already logged in
-            if (currentUser) {
-                initializeAppWithSync();
-            }
+        // Start app if already logged in
+        if (currentUser) {
+            initializeAppWithSync();
+        }
     </script>
 
     <!-- Category/Group Modal -->
