@@ -21,6 +21,11 @@
     <title>VocaVera</title>
     <!-- Versioned manifest to bust cache on updates -->
     <link rel="manifest" href="/manifest.json?v=3">
+
+    <!-- Google Fonts for Export (Plus Jakarta Sans + Hind Siliguri) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Apple touch icons with absolute URLs for reliability -->
     <link rel="apple-touch-icon" href="https://vocavera.vercel.app/icon-192.png?v=3">
     <link rel="apple-touch-icon" sizes="192x192" href="https://vocavera.vercel.app/icon-192.png?v=3">
@@ -8419,6 +8424,334 @@
             font-weight: 600;
             color: #6B7280;
         }
+
+        /* ============================================
+           PRINT PDF EXPORT STYLES
+           (HTML-based PDF generation via window.print)
+           ============================================ */
+        :root {
+            --export-ink: #0a0a0a;
+            --export-ink-soft: #2d2d2d;
+            --export-ink-muted: #6b6b6b;
+            --export-ink-faint: #999999;
+            --export-bg: #ffffff;
+            --export-border: #e0e0e0;
+            --export-border-soft: #f0f0f0;
+            --export-row-alt: #fafafa;
+            --export-font-en: "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            --export-font-bn: "Hind Siliguri", "Noto Sans Bengali", sans-serif;
+        }
+
+        /* Hidden print container by default */
+        #printExportContainer {
+            display: none !important;
+        }
+
+        /* A4 print setup */
+        @media print {
+            @page {
+                size: A4;
+                margin: 8mm 10mm 10mm 10mm;
+            }
+
+            html, body {
+                background: var(--export-bg) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            #printExportContainer {
+                display: block !important;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                padding: 0;
+                margin: 0;
+            }
+
+            .export-sheet {
+                width: 210mm;
+                min-height: 297mm;
+                margin: 0 auto;
+                padding: 10mm 10mm 12mm 10mm;
+                background: var(--export-bg);
+            }
+
+            /* Header */
+            .header {
+                display: grid;
+                grid-template-columns: 1fr auto;
+                gap: 20px;
+                align-items: end;
+                padding-bottom: 14px;
+                margin-bottom: 16px;
+                border-bottom: 2px solid var(--export-ink);
+                page-break-after: avoid;
+            }
+
+            .brand {
+                display: flex;
+                align-items: baseline;
+                gap: 10px;
+            }
+
+            .brand-mark {
+                width: 32px;
+                height: 32px;
+                border-radius: 8px;
+                display: grid;
+                place-items: center;
+                font-size: 16px;
+                font-weight: 700;
+                color: white;
+                background: #4F46E5;
+                letter-spacing: -0.5px;
+            }
+
+            .brand-text h1 {
+                font-size: 24px;
+                font-weight: 700;
+                letter-spacing: -0.6px;
+                color: var(--export-ink);
+                line-height: 1;
+                margin: 0;
+            }
+
+            .brand-text p {
+                margin-top: 4px;
+                font-size: 9px;
+                font-weight: 600;
+                letter-spacing: 1.4px;
+                text-transform: uppercase;
+                color: var(--export-ink-muted);
+            }
+
+            /* Sheet container */
+            .sheet {
+                width: 210mm;
+                min-height: 297mm;
+                margin: 0 auto;
+                padding: 10mm 10mm 12mm 10mm;
+                background: var(--export-bg);
+            }
+
+            .stats {
+                display: grid;
+                grid-template-columns: repeat(3, auto);
+                gap: 8px;
+            }
+
+            .stat {
+                padding: 8px 12px;
+                border: 1px solid var(--export-border);
+                text-align: center;
+                min-width: 72px;
+            }
+
+            .stat strong {
+                display: block;
+                font-size: 14px;
+                font-weight: 700;
+                line-height: 1;
+                color: var(--export-ink);
+                margin-bottom: 4px;
+            }
+
+            .stat span {
+                display: block;
+                font-size: 7.5px;
+                font-weight: 600;
+                color: var(--export-ink-muted);
+                text-transform: uppercase;
+                letter-spacing: 0.7px;
+            }
+
+            .section-title {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin: 2px 0 10px;
+                page-break-after: avoid;
+            }
+
+            .section-title h2 {
+                font-size: 12px;
+                font-weight: 800;
+                color: var(--export-ink);
+                letter-spacing: 0.75px;
+                text-transform: uppercase;
+                margin: 0;
+            }
+
+            .section-title .hint {
+                font-size: 9.5px;
+                color: var(--export-ink-muted);
+                font-weight: 700;
+            }
+
+            /* Table */
+            table.vocab-table {
+                width: 100%;
+                border-collapse: collapse;
+                table-layout: fixed;
+                font-size: 10px;
+                border: 1px solid var(--export-border);
+            }
+
+            col.no-col { width: 30px; }
+            col.word-col { width: 16%; }
+            col.def-col { width: 28%; }
+            col.bn-col { width: 18%; }
+            col.syn-col { width: 20%; }
+            col.ex-col { width: auto; }
+
+            thead th {
+                background: var(--export-ink);
+                color: var(--export-bg);
+                padding: 7px 8px;
+                text-align: left;
+                font-size: 7.5px;
+                font-weight: 700;
+                letter-spacing: 0.9px;
+                text-transform: uppercase;
+                border-bottom: 1px solid var(--export-ink);
+            }
+
+            thead th:last-child {
+                text-align: left;
+            }
+
+            tbody tr {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+
+            tbody tr:nth-child(even) {
+                background: var(--export-row-alt);
+            }
+
+            tbody tr:nth-child(odd) {
+                background: white;
+            }
+
+            tbody td {
+                padding: 7px 8px;
+                vertical-align: top;
+                border-bottom: 1px solid var(--export-border-soft);
+                color: var(--export-ink-soft);
+            }
+
+            tbody tr:last-child td {
+                border-bottom: none;
+            }
+
+            .no-cell {
+                text-align: center;
+                color: var(--export-ink-faint);
+                font-weight: 600;
+                font-size: 9px;
+            }
+
+            .word-cell {
+                font-size: 11.5px;
+                font-weight: 600;
+                color: var(--export-ink);
+                letter-spacing: -0.2px;
+            }
+
+            .definition-cell {
+                font-weight: 400;
+                color: var(--export-ink-soft);
+                line-height: 1.45;
+            }
+
+            .bangla-cell {
+                font-family: var(--export-font-bn);
+                font-size: 11px;
+                font-weight: 400;
+                line-height: 1.5;
+                color: var(--export-ink-soft);
+                letter-spacing: 0;
+            }
+
+            .synonyms {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 3px;
+                align-items: center;
+            }
+
+            .syn {
+                display: inline-block;
+                padding: 2px 6px;
+                border: 1px solid var(--export-border);
+                color: var(--export-ink-muted);
+                font-size: 8.5px;
+                font-weight: 500;
+                line-height: 1.3;
+            }
+
+            .example-cell {
+                color: var(--export-ink-muted);
+                font-size: 9.5px;
+                line-height: 1.45;
+                font-weight: 400;
+            }
+
+            .footer {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-top: 12px;
+                padding-top: 8px;
+                border-top: 1px solid var(--export-border);
+                color: var(--export-ink-faint);
+                font-size: 8.5px;
+                font-weight: 500;
+                page-break-inside: avoid;
+            }
+
+            .footer .export-id {
+                color: var(--export-ink);
+                background: var(--export-bg);
+                border: 1px solid var(--export-border);
+                padding: 2px 8px;
+                font-weight: 600;
+            }
+        }
+
+        @media print {
+            html, body {
+                background: var(--export-bg) !important;
+            }
+
+            .sheet {
+                width: auto;
+                margin: 0;
+                padding: 0;
+            }
+
+            thead th {
+                background: var(--export-ink) !important;
+                color: var(--export-bg) !important;
+            }
+
+            tbody tr:nth-child(even) {
+                background: var(--export-row-alt) !important;
+            }
+
+            /* Hide UI elements during print */
+            #app, .app-header, .tab-bar, .modals-container,
+            .toast-container, .confetti-container, .sheets-container,
+            .word-count-row, .filter-sort-row, .active-filters,
+            .empty-state, #uploadArea, .manage-section,
+            .export-btn, #exportDropdownEl, .card, .bento-card,
+            .activity-section, .wod-badge, .home-hero-card,
+            .progress-hero, .level-card, .sub-tab-toggle {
+                display: none !important;
+            }
+        }
     </style>
     <!-- SheetJS for Excel import/export -->
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js" crossorigin="anonymous"></script>
@@ -10172,6 +10505,66 @@
     <!-- Bottom Sheets Container -->
     <div id="sheetsContainer"></div>
 
+    <!-- Hidden HTML-based PDF Print Export Container -->
+    <div id="printExportContainer">
+        <main class="sheet" id="printSheet">
+            <header class="header">
+                <div class="brand">
+                    <div class="brand-mark">V</div>
+                    <div class="brand-text">
+                        <h1>VocaVera</h1>
+                        <p>Vocabulary Export Sheet</p>
+                    </div>
+                </div>
+
+                <div class="stats">
+                    <div class="stat">
+                        <strong id="printWordCount">0</strong>
+                        <span>Total Words</span>
+                    </div>
+                    <div class="stat">
+                        <strong id="printExportDate"></strong>
+                        <span>Export Date</span>
+                    </div>
+                    <div class="stat">
+                        <strong id="printPageCount">0</strong>
+                        <span>Total Pages</span>
+                    </div>
+                </div>
+            </header>
+
+            <table class="vocab-table" id="printTable">
+                <colgroup>
+                    <col class="no-col">
+                    <col class="word-col">
+                    <col class="def-col">
+                    <col class="bn-col">
+                    <col class="syn-col">
+                    <col class="ex-col">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Word</th>
+                        <th>Definition</th>
+                        <th>Bangla</th>
+                        <th>Synonyms</th>
+                        <th>Example</th>
+                    </tr>
+                </thead>
+                <tbody id="printTableBody">
+                    <!-- Filled dynamically -->
+                </tbody>
+            </table>
+
+            <footer class="footer" id="printFooter">
+                <span>Generated by VocaVera</span>
+                <span class="export-id" id="printExportId">Export ID: VV-000-000</span>
+                <span>For personal vocabulary learning</span>
+            </footer>
+        </main>
+    </div>
+
     <script>
         // ============================================
         // VOCAVERA APP - Complete JavaScript
@@ -10498,6 +10891,21 @@
                 if (!wordText || !definition) {
                     showToast('Please fill in word and definition', 'error');
                     return;
+                }
+
+                // Capture any pending synonym(s) in the input field
+                const pendingSyn = synonymInput.value.trim();
+                if (pendingSyn) {
+                    // Split on commas to support pasting comma-separated list
+                    const parts = pendingSyn.split(',').map(s => s.trim()).filter(s => s);
+                    const remainingSlots = 10 - synonyms.length;
+                    const toAdd = parts.slice(0, remainingSlots);
+                    toAdd.forEach(p => {
+                        const formatted = formatSynonym(p);
+                        if (!synonyms.includes(formatted)) {
+                            synonyms.push(formatted);
+                        }
+                    });
                 }
 
                 // Check duplicate
@@ -11196,6 +11604,132 @@
             doc.save('vocabulary_export_' + new Date().toISOString().split('T')[0] + '.pdf');
         }
 
+        function exportToPDFPrint() {
+            // Apply the same filtering and sorting as renderWords
+            let filtered = AppData.words.filter(w => {
+                const searchLower = searchQuery.toLowerCase();
+                const matchWord = w.word.toLowerCase().includes(searchLower);
+                const matchDef = w.definition && w.definition.toLowerCase().includes(searchLower);
+                const matchBangla = w.bangla && w.bangla.toLowerCase().includes(searchLower);
+                const synonymsArray = Array.isArray(w.synonyms) ? w.synonyms : (w.synonyms || '').toString().split(',').map(s => s.trim()).filter(s => s);
+                const matchSyn = synonymsArray.some(s => s.toLowerCase().includes(searchLower));
+                const matchExample = w.example && w.example.toLowerCase().includes(searchLower);
+                return matchWord || matchDef || matchBangla || matchSyn || matchExample;
+            });
+
+            // Apply category or group filter
+            if (filterMode === 'category') {
+                if (filterCategory !== 'all') {
+                    filtered = filterCategory === 'uncategorized'
+                        ? filtered.filter(w => !w.category)
+                        : filtered.filter(w => w.category === filterCategory);
+                }
+            } else if (filterGroup !== 'all') {
+                filtered = filtered.filter(w => w.group === filterGroup);
+            }
+
+            // Apply favorites filter
+            if (showFavoritesOnly) {
+                filtered = filtered.filter(w => w.favorite);
+            }
+
+            // Apply sorting
+            filtered.sort((a, b) => {
+                switch (sortBy) {
+                    case 'date-desc': return b.createdAt - a.createdAt;
+                    case 'date-asc': return a.createdAt - b.createdAt;
+                    case 'alpha-asc': return a.word.localeCompare(b.word);
+                    case 'alpha-desc': return b.word.localeCompare(a.word);
+                    case 'group-asc': return (a.group || '').localeCompare(b.group || '');
+                    case 'group-desc': return (b.group || '').localeCompare(a.group || '');
+                    case 'mastery-desc': return (b.mastery || 0) - (a.mastery || 0);
+                    case 'mastery-asc': return (a.mastery || 0) - (b.mastery || 0);
+                    default: return 0;
+                }
+            });
+
+            // Populate print container
+            const printTableBody = $('printTableBody');
+            const printWordCount = $('printWordCount');
+            const printExportDate = $('printExportDate');
+            const printPageCount = $('printPageCount');
+            const printExportId = $('printExportId');
+
+            // Clear previous content
+            printTableBody.innerHTML = '';
+
+            // Update stats
+            printWordCount.textContent = filtered.length;
+            printExportDate.textContent = new Date().toLocaleDateString('en-US', {
+                month: 'short', day: 'numeric', year: 'numeric'
+            });
+            // Generate unique export ID (format: VV-YYYY-NNN)
+            const year = new Date().getFullYear();
+            const randomNum = Math.floor(100 + Math.random() * 900);
+            printExportId.textContent = `Export ID: VV-${year}-${randomNum}`;
+            // Page count estimation: ~25 words per A4 page
+            const estimatedPages = Math.max(1, Math.ceil(filtered.length / 25));
+            printPageCount.textContent = estimatedPages.toString();
+
+            // Build table rows (XSS-safe)
+            filtered.forEach((w, index) => {
+                const row = document.createElement('tr');
+                const rowNum = (index + 1).toString().padStart(2, '0');
+                const synonyms = Array.isArray(w.synonyms)
+                    ? w.synonyms
+                    : (w.synonyms || '').toString().split(',').map(s => s.trim()).filter(s => s);
+
+                // # cell
+                const cellNo = document.createElement('td');
+                cellNo.className = 'no-cell';
+                cellNo.textContent = rowNum;
+                row.appendChild(cellNo);
+
+                // Word cell
+                const cellWord = document.createElement('td');
+                cellWord.className = 'word-cell';
+                cellWord.textContent = w.word || '—';
+                row.appendChild(cellWord);
+
+                // Definition cell
+                const cellDef = document.createElement('td');
+                cellDef.className = 'definition-cell';
+                cellDef.textContent = w.definition || '—';
+                row.appendChild(cellDef);
+
+                // Bangla cell
+                const cellBangla = document.createElement('td');
+                cellBangla.className = 'bangla-cell';
+                cellBangla.setAttribute('lang', 'bn');
+                cellBangla.textContent = w.bangla || '—';
+                row.appendChild(cellBangla);
+
+                // Synonyms cell
+                const cellSyn = document.createElement('td');
+                const synDiv = document.createElement('div');
+                synDiv.className = 'synonyms';
+                synonyms.slice(0, 3).forEach(syn => {
+                    const span = document.createElement('span');
+                    span.className = 'syn';
+                    span.textContent = syn;
+                    synDiv.appendChild(span);
+                });
+                cellSyn.appendChild(synDiv);
+                row.appendChild(cellSyn);
+
+                // Example cell
+                const cellEx = document.createElement('td');
+                cellEx.className = 'example-cell';
+                cellEx.textContent = w.example || '—';
+                row.appendChild(cellEx);
+
+                printTableBody.appendChild(row);
+            });
+
+            // Trigger print dialog
+            window.print();
+        }
+
         function exportToExcel() {
             // Apply the same filtering and sorting as renderWords
             let filtered = AppData.words.filter(w => {
@@ -11386,23 +11920,42 @@
                     border-radius: 16px;
                     box-shadow: 0 15px 50px rgba(0,0,0,0.4);
                     z-index: 999999;
-                    min-width: 200px;
+                    min-width: 240px;
                     overflow: hidden;
                 ">`;
-                options += `<div class="export-option" data-type="pdf" style="padding: 16px 20px; cursor: pointer; display: flex; align-items: center; gap: 12px; font-weight: 600; color: #1F2937; border-bottom: 1px solid #F3F4F6;">
+                // PDF (programmatic - existing)
+                options += `<div class="export-option" data-type="pdf" style="padding: 14px 20px; cursor: pointer; display: flex; align-items: center; gap: 12px; font-weight: 600; color: #1F2937; border-bottom: 1px solid #F3F4F6;">
                     <svg viewBox="0 0 24 24" fill="none" width="20" height="20" style="color: #EF4444;">
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                         <path d="M14 2v6h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                         <text x="7" y="17" font-size="6" fill="currentColor" font-weight="bold">PDF</text>
                     </svg>
-                    Export as PDF
+                    <div>
+                        <div>Export as PDF</div>
+                        <div style="font-size:11px;font-weight:400;color:#6B7280">Programmatic layout</div>
+                    </div>
                 </div>`;
-                options += `<div class="export-option" data-type="excel" style="padding: 16px 20px; cursor: pointer; display: flex; align-items: center; gap: 12px; font-weight: 600; color: #1F2937;">
+                // PDF (HTML print - new)
+                options += `<div class="export-option" data-type="pdfprint" style="padding: 14px 20px; cursor: pointer; display: flex; align-items: center; gap: 12px; font-weight: 600; color: #1F2937; border-bottom: 1px solid #F3F4F6;">
+                    <svg viewBox="0 0 24 24" fill="none" width="20" height="20" style="color: #3B82F6;">
+                        <path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M6 14h12v8H6z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <div>
+                        <div>Export as PDF</div>
+                        <div style="font-size:11px;font-weight:400;color:#6B7280">Print-optimized layout</div>
+                    </div>
+                </div>`;
+                // Excel
+                options += `<div class="export-option" data-type="excel" style="padding: 14px 20px; cursor: pointer; display: flex; align-items: center; gap: 12px; font-weight: 600; color: #1F2937;">
                     <svg viewBox="0 0 24 24" fill="none" width="20" height="20" style="color: #22C55E;">
                         <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
                         <path d="M3 9h18M9 9v12" stroke="currentColor" stroke-width="2"/>
                     </svg>
-                    Export as Excel
+                    <div>
+                        <div>Export as Excel</div>
+                        <div style="font-size:11px;font-weight:400;color:#6B7280">Spreadsheet format</div>
+                    </div>
                 </div>`;
                 options += '</div>';
 
@@ -11413,6 +11966,7 @@
                         e.stopPropagation();
                         const type = e.currentTarget.dataset.type;
                         if (type === 'pdf') exportToPDF();
+                        else if (type === 'pdfprint') exportToPDFPrint();
                         else if (type === 'excel') exportToExcel();
                         exportOpen = false;
                         renderExportDropdown();
@@ -12890,7 +13444,7 @@
             $('exportCsvBtn').addEventListener('click', () => {
                 const headers = ['word', 'definition', 'bangla', 'synonyms', 'example', 'category', 'mastery'];
                 const rows = AppData.words.map(w => [
-                    w.word, w.definition, w.bangla, w.synonyms?.join(';'), w.example, w.category, w.mastery
+                    w.word, w.definition, w.bangla, w.synonyms?.join(', '), w.example, w.category, w.mastery
                 ]);
                 const csv = [headers, ...rows].map(r => r.map(f => `"${(f || '').replace(/"/g, '""')}"`).join(',')).join('\n');
                 downloadFile(csv, 'vocavera-words.csv', 'text/csv');
@@ -13050,7 +13604,7 @@
                                 word: wordText,
                                 definition: values[1] || '',
                                 bangla: values[2] || '',
-                                synonyms: values[3]?.split(';').map(s => s.trim()) || [],
+                                    synonyms: values[3]?.split(',').map(s => s.trim()) || [],
                                 example: values[4] || '',
                                 category: categoryId,
                                 group: values[6] ? values[6].toString().toLowerCase().replace(/\s+/g, '_') : '',
@@ -13124,7 +13678,7 @@
                                 word: wordText,
                                 definition: row[1] || '',
                                 bangla: row[2] || '',
-                                synonyms: row[3] ? row[3].toString().split(';').map(s => s.trim()) : [],
+                                synonyms: row[3] ? row[3].toString().split(',').map(s => s.trim()) : [],
                                 example: row[4] || '',
                                 category: categoryId,
                                 group: groupName ? groupName.toLowerCase().replace(/\s+/g, '_') : '',
